@@ -8,10 +8,11 @@ import {
   Animated,
   SafeAreaView,
   Image,
+
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Shield, Eye, Lock, CheckCircle, ArrowRight } from 'lucide-react-native';
+import { Shield, Eye, Lock, CheckCircle, ArrowRight, Clock, Target, Zap, BarChart3 } from 'lucide-react-native';
 
 
 
@@ -26,6 +27,7 @@ export default function SplashScreen() {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
   const [currentStep, setCurrentStep] = useState(0);
+  const [onboardingStep, setOnboardingStep] = useState(0);
   const [consent, setConsent] = useState<ConsentState>({
     dataProcessing: false,
     temporalMetrics: false,
@@ -73,17 +75,114 @@ export default function SplashScreen() {
     if (!canProceed()) return;
     
     try {
-      await AsyncStorage.setItem('chrona_has_launched', 'true');
       await AsyncStorage.setItem('chrona_consent', JSON.stringify({
         ...consent,
         timestamp: Date.now(),
         version: '1.0.0',
       }));
       
-      router.replace('/(tabs)/tasks');
+      setCurrentStep(2); // Move to onboarding
     } catch (error) {
       console.error('Error saving consent:', error);
     }
+  };
+
+  const completeOnboarding = async () => {
+    try {
+      await AsyncStorage.setItem('chrona_has_launched', 'true');
+      await AsyncStorage.setItem('chrona_onboarding_completed', 'true');
+      router.replace('/(tabs)/metrology');
+    } catch (error) {
+      console.error('Error completing onboarding:', error);
+    }
+  };
+
+  const onboardingSteps = [
+    {
+      icon: Clock,
+      title: 'Time Metrology',
+      description: 'Measure your temporal patterns with precision. Track resolution, jitter, drift, and latency to understand how you experience time.',
+    },
+    {
+      icon: Target,
+      title: 'Flow State Detection',
+      description: 'Automatically detect when you enter flow states. Monitor intensity, duration, and patterns to optimize your peak performance windows.',
+    },
+    {
+      icon: Zap,
+      title: 'Entropy Budget',
+      description: 'Manage your daily decision-making energy. Track cognitive load and optimize task sequencing for maximum efficiency.',
+    },
+    {
+      icon: BarChart3,
+      title: 'Chrono Fingerprint',
+      description: 'Discover your unique temporal signature. Identify peak focus hours, stability windows, and personalized productivity patterns.',
+    },
+  ];
+
+  const renderOnboarding = () => {
+    const currentOnboardingStep = onboardingSteps[onboardingStep];
+    const IconComponent = currentOnboardingStep.icon;
+    
+    return (
+      <View style={styles.onboardingContainer}>
+        <View style={styles.onboardingHeader}>
+          <Text style={styles.onboardingTitle}>Welcome to Chrona</Text>
+          <Text style={styles.onboardingSubtitle}>
+            Let&apos;s explore how Chrona helps you master time
+          </Text>
+        </View>
+        
+        <View style={styles.onboardingContent}>
+          <View style={styles.featureCard}>
+            <View style={styles.featureIcon}>
+              <IconComponent size={28} color="#0EA5E9" />
+            </View>
+            <Text style={styles.featureTitle}>{currentOnboardingStep.title}</Text>
+            <Text style={styles.featureDescription}>{currentOnboardingStep.description}</Text>
+          </View>
+        </View>
+        
+        <View style={styles.onboardingNavigation}>
+          <TouchableOpacity 
+            style={styles.skipButton}
+            onPress={completeOnboarding}
+          >
+            <Text style={styles.skipButtonText}>Skip</Text>
+          </TouchableOpacity>
+          
+          <View style={styles.progressContainer}>
+            {onboardingSteps.map((_, index) => (
+              <View 
+                key={index}
+                style={[
+                  styles.progressDot,
+                  index === onboardingStep && styles.progressDotActive
+                ]}
+              />
+            ))}
+          </View>
+          
+          {onboardingStep < onboardingSteps.length - 1 ? (
+            <TouchableOpacity 
+              style={styles.nextOnboardingButton}
+              onPress={() => setOnboardingStep(prev => prev + 1)}
+            >
+              <Text style={styles.nextOnboardingButtonText}>Next</Text>
+              <ArrowRight size={16} color="#FFFFFF" />
+            </TouchableOpacity>
+          ) : (
+            <TouchableOpacity 
+              style={styles.getStartedButton}
+              onPress={completeOnboarding}
+            >
+              <Text style={styles.getStartedButtonText}>Get Started</Text>
+              <ArrowRight size={18} color="#FFFFFF" />
+            </TouchableOpacity>
+          )}
+        </View>
+      </View>
+    );
   };
 
   const renderWelcome = () => (
@@ -108,14 +207,18 @@ export default function SplashScreen() {
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           }
-        ]}>Chrona</Animated.Text>
+        ]}>
+          <Text>Chrona</Text>
+        </Animated.Text>
         <Animated.Text style={[
           styles.tagline,
           {
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           }
-        ]}>Time Metrology for Human Flourishing</Animated.Text>
+        ]}>
+          <Text>Time Metrology for Human Flourishing</Text>
+        </Animated.Text>
       </View>
       
       <View style={styles.descriptionContainer}>
@@ -250,7 +353,9 @@ export default function SplashScreen() {
           },
         ]}
       >
-        {currentStep === 0 ? renderWelcome() : renderConsent()}
+        {currentStep === 0 ? renderWelcome() : 
+         currentStep === 1 ? renderConsent() : 
+         renderOnboarding()}
       </Animated.View>
     </SafeAreaView>
   );
@@ -430,5 +535,120 @@ const styles = StyleSheet.create({
   },
   proceedButtonTextDisabled: {
     color: '#9CA3AF',
+  },
+  onboardingContainer: {
+    flex: 1,
+    justifyContent: 'space-between',
+    paddingVertical: 40,
+  },
+  onboardingHeader: {
+    alignItems: 'center',
+    marginTop: 40,
+  },
+  onboardingTitle: {
+    fontSize: 32,
+    fontWeight: '800',
+    color: '#FFFFFF',
+    textAlign: 'center',
+    marginBottom: 12,
+    letterSpacing: -0.5,
+  },
+  onboardingSubtitle: {
+    fontSize: 18,
+    color: '#9CA3AF',
+    textAlign: 'center',
+    lineHeight: 24,
+  },
+  onboardingContent: {
+    flex: 1,
+    justifyContent: 'center',
+    paddingHorizontal: 20,
+  },
+  featureCard: {
+    backgroundColor: '#111111',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 20,
+    borderWidth: 1,
+    borderColor: '#1F1F1F',
+  },
+  featureIcon: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: 'rgba(14, 165, 233, 0.2)',
+  },
+  featureTitle: {
+    fontSize: 20,
+    fontWeight: '700',
+    color: '#FFFFFF',
+    marginBottom: 8,
+  },
+  featureDescription: {
+    fontSize: 16,
+    color: '#9CA3AF',
+    lineHeight: 22,
+  },
+  onboardingNavigation: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+  },
+  skipButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 20,
+  },
+  skipButtonText: {
+    color: '#6B7280',
+    fontSize: 16,
+    fontWeight: '500',
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  progressDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#374151',
+  },
+  progressDotActive: {
+    backgroundColor: '#0EA5E9',
+    width: 24,
+  },
+  nextOnboardingButton: {
+    backgroundColor: '#0EA5E9',
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  nextOnboardingButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  getStartedButton: {
+    backgroundColor: '#10B981',
+    paddingVertical: 16,
+    paddingHorizontal: 32,
+    borderRadius: 12,
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  getStartedButtonText: {
+    color: '#FFFFFF',
+    fontSize: 18,
+    fontWeight: '700',
   },
 });

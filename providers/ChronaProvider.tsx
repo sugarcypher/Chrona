@@ -2,6 +2,8 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Task, TimeBlock, FlowState, ChronoFingerprint, Nudge, TimeMetrics } from '@/types/chrona';
+import { default as OnboardingTourComponent, TourStep } from '@/components/ui/OnboardingTour';
+import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 
 interface ChronaContextValue {
   tasks: Task[];
@@ -29,9 +31,13 @@ interface ChronaContextValue {
   updateNudgeSettings: (settings: any) => void;
   updateSettings: (settings: any) => void;
   clearAllData: () => void;
+  
+  // Onboarding tour
+  startTour: (steps: TourStep[]) => void;
+  showTour: boolean;
 }
 
-export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>(() => {
+export const [ChronaContextProviderComponent, useChrona] = createContextHook<ChronaContextValue>(() => {
   const [tasks, setTasks] = useState<Task[]>([]);
   const [activeTask, setActiveTask] = useState<Task | null>(null);
   const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([]);
@@ -62,10 +68,24 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
     loadData();
   }, []);
 
+  const saveData = useCallback(async () => {
+    try {
+      await Promise.all([
+        AsyncStorage.setItem('chrona_tasks', JSON.stringify(tasks)),
+        AsyncStorage.setItem('chrona_blocks', JSON.stringify(timeBlocks)),
+        AsyncStorage.setItem('chrona_entropy', JSON.stringify(entropyBudget)),
+        AsyncStorage.setItem('chrona_nudges', JSON.stringify(nudgeLedger)),
+        AsyncStorage.setItem('chrona_settings', JSON.stringify(settings)),
+      ]);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  }, [tasks, timeBlocks, entropyBudget, nudgeLedger, settings]);
+
   // Save data to AsyncStorage
   useEffect(() => {
     saveData();
-  }, [tasks, timeBlocks, entropyBudget, nudgeLedger, settings]);
+  }, [saveData]);
 
   const loadData = async () => {
     try {
@@ -87,19 +107,7 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
     }
   };
 
-  const saveData = async () => {
-    try {
-      await Promise.all([
-        AsyncStorage.setItem('chrona_tasks', JSON.stringify(tasks)),
-        AsyncStorage.setItem('chrona_blocks', JSON.stringify(timeBlocks)),
-        AsyncStorage.setItem('chrona_entropy', JSON.stringify(entropyBudget)),
-        AsyncStorage.setItem('chrona_nudges', JSON.stringify(nudgeLedger)),
-        AsyncStorage.setItem('chrona_settings', JSON.stringify(settings)),
-      ]);
-    } catch (error) {
-      console.error('Error saving data:', error);
-    }
-  };
+
 
   const currentMetrics = useMemo<TimeMetrics>(() => {
     if (timeBlocks.length === 0) {
@@ -165,6 +173,14 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
     ));
   }, []);
 
+  const addTimeBlock = useCallback((block: Omit<TimeBlock, 'id'>) => {
+    const newBlock: TimeBlock = {
+      ...block,
+      id: Date.now().toString(),
+    };
+    setTimeBlocks(prev => [...prev, newBlock]);
+  }, []);
+
   const startTask = useCallback((taskId: string) => {
     const task = tasks.find(t => t.id === taskId);
     if (!task) return;
@@ -181,7 +197,7 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
       flowIntensity: 0,
       initiationLatency: task.startedAt ? Date.now() - task.startedAt : 0,
     });
-  }, [tasks]);
+  }, [tasks, updateTask, addTimeBlock]);
 
   const pauseTask = useCallback(() => {
     if (!activeTask) return;
@@ -194,7 +210,7 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
     });
     
     setActiveTask(null);
-  }, [activeTask]);
+  }, [activeTask, updateTask]);
 
   const completeTask = useCallback((taskId: string, perceptionRatio: number) => {
     const task = tasks.find(t => t.id === taskId);
@@ -208,15 +224,9 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
     if (activeTask?.id === taskId) {
       setActiveTask(null);
     }
-  }, [tasks, activeTask]);
+  }, [tasks, activeTask, updateTask]);
 
-  const addTimeBlock = useCallback((block: Omit<TimeBlock, 'id'>) => {
-    const newBlock: TimeBlock = {
-      ...block,
-      id: Date.now().toString(),
-    };
-    setTimeBlocks(prev => [...prev, newBlock]);
-  }, []);
+
 
   const updateFlowState = useCallback((updates: Partial<FlowState>) => {
     setFlowState(prev => ({ ...prev, ...updates }));
@@ -254,6 +264,8 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
     ]);
   }, []);
 
+  const { startTour, showTour } = useOnboardingTour();
+
   return {
     tasks,
     activeTask,
@@ -280,5 +292,24 @@ export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>
     updateNudgeSettings,
     updateSettings,
     clearAllData,
+    
+    startTour,
+    showTour,
   };
 });
+
+export function ChronaProvider({ children }: { children: React.ReactNode }) {
+  const { showTour, tourSteps, completeTour, skipTour } = useOnboardingTour();
+  
+  return (
+    <ChronaContextProviderComponent>
+      {children}
+      <OnboardingTourComponent
+        visible={showTour}
+        steps={tourSteps}
+        onComplete={completeTour}
+        onSkip={skipTour}
+      />
+    </ChronaContextProviderComponent>
+  );
+}
