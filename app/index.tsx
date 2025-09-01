@@ -11,7 +11,7 @@ export default function Index() {
     try {
       const hasLaunched = await AsyncStorage.getItem('chrona_has_launched');
       if (hasLaunched) {
-        router.replace('/(tabs)');
+        router.replace('/metrology');
       } else {
         router.replace('/splash');
       }

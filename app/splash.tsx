@@ -54,7 +54,7 @@ export default function SplashScreen() {
     try {
       const hasLaunched = await AsyncStorage.getItem('chrona_has_launched');
       if (hasLaunched) {
-        router.replace('/(tabs)');
+        router.replace('/metrology');
       }
     } catch (error) {
       console.error('Error checking first launch:', error);
@@ -80,7 +80,7 @@ export default function SplashScreen() {
         version: '1.0.0',
       }));
       
-      router.replace('/(tabs)');
+      router.replace('/metrology');
     } catch (error) {
       console.error('Error saving consent:', error);
     }
