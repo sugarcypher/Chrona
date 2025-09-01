@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "Chrona — Consentful, Antifragile Time Metrology App",
-    "slug": "chrona-consentful-antifragile-time-metrology-app",
+    "name": "Chrona",
+    "slug": "chrona",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -15,14 +15,14 @@
     },
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "app.rork.chrona-consentful-antifragile-time-metrology-app"
+      "bundleIdentifier": "app.rork.chrona"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "app.rork.chrona-consentful-antifragile-time-metrology-app"
+      "package": "app.rork.chrona"
     },
     "web": {
       "favicon": "./assets/images/favicon.png"
