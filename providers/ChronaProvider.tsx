@@ -1,0 +1,284 @@
+import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import createContextHook from '@nkzw/create-context-hook';
+import AsyncStorage from '@react-native-async-storage/async-storage';
+import { Task, TimeBlock, FlowState, ChronoFingerprint, Nudge, TimeMetrics } from '@/types/chrona';
+
+interface ChronaContextValue {
+  tasks: Task[];
+  activeTask: Task | null;
+  timeBlocks: TimeBlock[];
+  flowState: FlowState;
+  currentMetrics: TimeMetrics;
+  chronoFingerprint: ChronoFingerprint;
+  entropyBudget: { total: number; used: number };
+  nudgeLedger: Nudge[];
+  nudgeSettings: any;
+  settings: any;
+  
+  addTask: (task: Omit<Task, 'id' | 'createdAt' | 'actualMinutes'>) => void;
+  updateTask: (id: string, updates: Partial<Task>) => void;
+  startTask: (taskId: string) => void;
+  pauseTask: () => void;
+  completeTask: (taskId: string, perceptionRatio: number) => void;
+  
+  addTimeBlock: (block: Omit<TimeBlock, 'id'>) => void;
+  updateFlowState: (updates: Partial<FlowState>) => void;
+  updateEntropyBudget: (budget: { total: number }) => void;
+  
+  addNudge: (nudge: Nudge) => void;
+  updateNudgeSettings: (settings: any) => void;
+  updateSettings: (settings: any) => void;
+  clearAllData: () => void;
+}
+
+export const [ChronaProvider, useChrona] = createContextHook<ChronaContextValue>(() => {
+  const [tasks, setTasks] = useState<Task[]>([]);
+  const [activeTask, setActiveTask] = useState<Task | null>(null);
+  const [timeBlocks, setTimeBlocks] = useState<TimeBlock[]>([]);
+  const [flowState, setFlowState] = useState<FlowState>({
+    isInFlow: false,
+    intensity: 0,
+    entryTime: null,
+    halfLife: 25,
+    entryVelocity: 1.0,
+    sustainedMinutes: 0,
+  });
+  const [entropyBudget, setEntropyBudget] = useState({ total: 60, used: 0 });
+  const [nudgeLedger, setNudgeLedger] = useState<Nudge[]>([]);
+  const [nudgeSettings, setNudgeSettings] = useState({
+    regretMinimization: false,
+  });
+  const [settings, setSettings] = useState({
+    trackMicroPatterns: true,
+    autoDetectFlow: true,
+    usePowerLaw: true,
+    anonymousMetrics: false,
+    nudgeNotifications: true,
+    flowAlerts: true,
+  });
+
+  // Load data from AsyncStorage
+  useEffect(() => {
+    loadData();
+  }, []);
+
+  // Save data to AsyncStorage
+  useEffect(() => {
+    saveData();
+  }, [tasks, timeBlocks, entropyBudget, nudgeLedger, settings]);
+
+  const loadData = async () => {
+    try {
+      const [tasksData, blocksData, budgetData, nudgesData, settingsData] = await Promise.all([
+        AsyncStorage.getItem('chrona_tasks'),
+        AsyncStorage.getItem('chrona_blocks'),
+        AsyncStorage.getItem('chrona_entropy'),
+        AsyncStorage.getItem('chrona_nudges'),
+        AsyncStorage.getItem('chrona_settings'),
+      ]);
+
+      if (tasksData) setTasks(JSON.parse(tasksData));
+      if (blocksData) setTimeBlocks(JSON.parse(blocksData));
+      if (budgetData) setEntropyBudget(JSON.parse(budgetData));
+      if (nudgesData) setNudgeLedger(JSON.parse(nudgesData));
+      if (settingsData) setSettings(JSON.parse(settingsData));
+    } catch (error) {
+      console.error('Error loading data:', error);
+    }
+  };
+
+  const saveData = async () => {
+    try {
+      await Promise.all([
+        AsyncStorage.setItem('chrona_tasks', JSON.stringify(tasks)),
+        AsyncStorage.setItem('chrona_blocks', JSON.stringify(timeBlocks)),
+        AsyncStorage.setItem('chrona_entropy', JSON.stringify(entropyBudget)),
+        AsyncStorage.setItem('chrona_nudges', JSON.stringify(nudgeLedger)),
+        AsyncStorage.setItem('chrona_settings', JSON.stringify(settings)),
+      ]);
+    } catch (error) {
+      console.error('Error saving data:', error);
+    }
+  };
+
+  const currentMetrics = useMemo<TimeMetrics>(() => {
+    if (timeBlocks.length === 0) {
+      return { resolution: 5, jitter: 0, drift: 0, latency: 0 };
+    }
+
+    const recentBlocks = timeBlocks.slice(-20);
+    
+    // Resolution: smallest time unit
+    const resolution = Math.min(...recentBlocks.map(b => b.duration));
+    
+    // Jitter: variance in timing
+    const avgDuration = recentBlocks.reduce((sum, b) => sum + b.duration, 0) / recentBlocks.length;
+    const variance = recentBlocks.reduce((sum, b) => sum + Math.pow(b.duration - avgDuration, 2), 0) / recentBlocks.length;
+    const jitter = Math.sqrt(variance);
+    
+    // Drift: deviation from plan
+    const drift = tasks.reduce((sum, task) => {
+      if (task.actualMinutes) {
+        return sum + Math.abs(task.actualMinutes - task.estimatedMinutes);
+      }
+      return sum;
+    }, 0) / Math.max(1, tasks.filter(t => t.actualMinutes).length);
+    
+    // Latency: start delay
+    const latency = recentBlocks.reduce((sum, b) => sum + (b.initiationLatency || 0), 0) / recentBlocks.length;
+    
+    return { resolution, jitter, drift, latency };
+  }, [timeBlocks, tasks]);
+
+  const chronoFingerprint = useMemo<ChronoFingerprint>(() => {
+    // Analyze time blocks to find patterns
+    const hourlyFocus = Array(24).fill(0);
+    timeBlocks.forEach(block => {
+      const hour = new Date(block.startTime).getHours();
+      if (block.flowIntensity) {
+        hourlyFocus[hour] += block.flowIntensity;
+      }
+    });
+    
+    const peakHour = hourlyFocus.indexOf(Math.max(...hourlyFocus));
+    
+    return {
+      peakFocusHour: peakHour,
+      stabilityWindow: '2-4pm',
+      avgResolution: currentMetrics.resolution,
+    };
+  }, [timeBlocks, currentMetrics]);
+
+  const addTask = useCallback((task: Omit<Task, 'id' | 'createdAt' | 'actualMinutes'>) => {
+    const newTask: Task = {
+      ...task,
+      id: Date.now().toString(),
+      createdAt: Date.now(),
+      actualMinutes: 0,
+    };
+    setTasks(prev => [...prev, newTask]);
+  }, []);
+
+  const updateTask = useCallback((id: string, updates: Partial<Task>) => {
+    setTasks(prev => prev.map(task => 
+      task.id === id ? { ...task, ...updates } : task
+    ));
+  }, []);
+
+  const startTask = useCallback((taskId: string) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    setActiveTask(task);
+    updateTask(taskId, { startedAt: Date.now() });
+    
+    // Create time block
+    addTimeBlock({
+      taskId,
+      startTime: Date.now(),
+      endTime: Date.now(),
+      duration: 0,
+      flowIntensity: 0,
+      initiationLatency: task.startedAt ? Date.now() - task.startedAt : 0,
+    });
+  }, [tasks]);
+
+  const pauseTask = useCallback(() => {
+    if (!activeTask) return;
+    
+    const duration = activeTask.startedAt ? 
+      Math.floor((Date.now() - activeTask.startedAt) / 60000) : 0;
+    
+    updateTask(activeTask.id, {
+      actualMinutes: (activeTask.actualMinutes || 0) + duration,
+    });
+    
+    setActiveTask(null);
+  }, [activeTask]);
+
+  const completeTask = useCallback((taskId: string, perceptionRatio: number) => {
+    const task = tasks.find(t => t.id === taskId);
+    if (!task) return;
+    
+    updateTask(taskId, {
+      completedAt: Date.now(),
+      perceptionRatio,
+    });
+    
+    if (activeTask?.id === taskId) {
+      setActiveTask(null);
+    }
+  }, [tasks, activeTask]);
+
+  const addTimeBlock = useCallback((block: Omit<TimeBlock, 'id'>) => {
+    const newBlock: TimeBlock = {
+      ...block,
+      id: Date.now().toString(),
+    };
+    setTimeBlocks(prev => [...prev, newBlock]);
+  }, []);
+
+  const updateFlowState = useCallback((updates: Partial<FlowState>) => {
+    setFlowState(prev => ({ ...prev, ...updates }));
+  }, []);
+
+  const updateEntropyBudget = useCallback((budget: { total: number }) => {
+    setEntropyBudget(prev => ({ ...prev, ...budget }));
+  }, []);
+
+  const addNudge = useCallback((nudge: Nudge) => {
+    setNudgeLedger(prev => [...prev, nudge]);
+  }, []);
+
+  const updateNudgeSettings = useCallback((newSettings: any) => {
+    setNudgeSettings(prev => ({ ...prev, ...newSettings }));
+  }, []);
+
+  const updateSettings = useCallback((newSettings: any) => {
+    setSettings(prev => ({ ...prev, ...newSettings }));
+  }, []);
+
+  const clearAllData = useCallback(async () => {
+    setTasks([]);
+    setTimeBlocks([]);
+    setEntropyBudget({ total: 60, used: 0 });
+    setNudgeLedger([]);
+    setActiveTask(null);
+    
+    await AsyncStorage.multiRemove([
+      'chrona_tasks',
+      'chrona_blocks',
+      'chrona_entropy',
+      'chrona_nudges',
+      'chrona_settings',
+    ]);
+  }, []);
+
+  return {
+    tasks,
+    activeTask,
+    timeBlocks,
+    flowState,
+    currentMetrics,
+    chronoFingerprint,
+    entropyBudget,
+    nudgeLedger,
+    nudgeSettings,
+    settings,
+    
+    addTask,
+    updateTask,
+    startTask,
+    pauseTask,
+    completeTask,
+    
+    addTimeBlock,
+    updateFlowState,
+    updateEntropyBudget,
+    
+    addNudge,
+    updateNudgeSettings,
+    updateSettings,
+    clearAllData,
+  };
+});
