@@ -22,13 +22,7 @@ export default function TabLayout() {
         },
       }}
     >
-      <Tabs.Screen
-        name="index"
-        options={{
-          title: "Timeline",
-          tabBarIcon: ({ color }) => <Clock size={24} color={color} />,
-        }}
-      />
+
       <Tabs.Screen
         name="metrology"
         options={{

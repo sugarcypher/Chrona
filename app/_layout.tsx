@@ -1,7 +1,8 @@
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
+
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ChronaProvider } from "@/providers/ChronaProvider";
 import { StatusBar } from "expo-status-bar";
@@ -22,6 +23,8 @@ function RootLayoutNav() {
         backgroundColor: '#0A0A0A'
       }
     }}>
+      <Stack.Screen name="index" options={{ headerShown: false }} />
+      <Stack.Screen name="splash" options={{ headerShown: false }} />
       <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
       <Stack.Screen 
         name="nudge-ledger" 
@@ -44,14 +47,46 @@ function RootLayoutNav() {
           presentation: "modal"
         }} 
       />
+      <Stack.Screen 
+        name="privacy-dashboard" 
+        options={{ 
+          title: "Privacy Dashboard",
+          presentation: "modal"
+        }} 
+      />
+      <Stack.Screen 
+        name="security-settings" 
+        options={{ 
+          title: "Security Settings",
+          presentation: "modal"
+        }} 
+      />
     </Stack>
   );
 }
 
 export default function RootLayout() {
+  const [isReady, setIsReady] = useState(false);
+
   useEffect(() => {
-    SplashScreen.hideAsync();
+    async function prepare() {
+      try {
+        // Keep splash screen visible while we prepare
+        await SplashScreen.preventAutoHideAsync();
+      } catch (error) {
+        console.error('Error preventing splash screen:', error);
+      } finally {
+        setIsReady(true);
+        SplashScreen.hideAsync();
+      }
+    }
+
+    prepare();
   }, []);
+
+  if (!isReady) {
+    return null;
+  }
 
   return (
     <QueryClientProvider client={queryClient}>
