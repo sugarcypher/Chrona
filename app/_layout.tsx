@@ -17,16 +17,24 @@ function RootLayoutNav() {
       headerBackTitle: "Back",
       headerStyle: {
         backgroundColor: '#FFFFFF',
+        borderBottomWidth: 0,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 1 },
+        shadowOpacity: 0.05,
+        shadowRadius: 3,
+        elevation: 2,
       } as any,
-      headerTintColor: '#1F2937',
+      headerTintColor: '#1C1917',
       headerTitleStyle: {
         fontWeight: '700',
-        fontSize: 18,
-        letterSpacing: -0.3,
+        fontSize: 20,
+        letterSpacing: -0.4,
+        color: '#1C1917',
       },
       contentStyle: {
-        backgroundColor: '#F8FAFC'
-      }
+        backgroundColor: '#FAFAF9'
+      },
+      headerShadowVisible: false,
     }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />
       <Stack.Screen name="splash" options={{ headerShown: false }} />

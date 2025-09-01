@@ -5,13 +5,14 @@ import { Colors, Typography, BorderRadius, Shadows, Layout } from '@/constants/d
 interface ButtonProps {
   title: string;
   onPress: () => void;
-  variant?: 'primary' | 'secondary' | 'outline' | 'ghost';
-  size?: 'sm' | 'md' | 'lg';
+  variant?: 'primary' | 'secondary' | 'outline' | 'ghost' | 'accent';
+  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   disabled?: boolean;
   loading?: boolean;
   style?: ViewStyle;
   textStyle?: TextStyle;
   icon?: React.ReactNode;
+  fullWidth?: boolean;
 }
 
 export const Button: React.FC<ButtonProps> = ({
@@ -24,12 +25,14 @@ export const Button: React.FC<ButtonProps> = ({
   style,
   textStyle,
   icon,
+  fullWidth = false,
 }) => {
   const buttonStyle = [
     styles.base,
     styles[variant],
     styles[size],
     disabled && styles.disabled,
+    fullWidth && styles.fullWidth,
     style,
   ];
 
@@ -51,7 +54,7 @@ export const Button: React.FC<ButtonProps> = ({
       {loading ? (
         <ActivityIndicator 
           size="small" 
-          color={variant === 'primary' ? Colors.text.inverse : Colors.primary[500]} 
+          color={variant === 'primary' || variant === 'accent' ? Colors.text.inverse : Colors.primary[600]} 
         />
       ) : (
         <>
@@ -75,21 +78,29 @@ const styles = StyleSheet.create({
   
   // Variants
   primary: {
-    backgroundColor: Colors.primary[500],
+    backgroundColor: Colors.primary[600],
   },
   secondary: {
     backgroundColor: Colors.neutral[100],
   },
+  accent: {
+    backgroundColor: Colors.accent[600],
+  },
   outline: {
     backgroundColor: 'transparent',
     borderWidth: 1.5,
-    borderColor: Colors.primary[500],
+    borderColor: Colors.primary[600],
   },
   ghost: {
     backgroundColor: 'transparent',
   },
   
   // Sizes
+  xs: {
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    minHeight: 28,
+  },
   sm: {
     paddingHorizontal: 16,
     paddingVertical: 8,
@@ -105,6 +116,16 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     minHeight: 56,
   },
+  xl: {
+    paddingHorizontal: 32,
+    paddingVertical: 20,
+    minHeight: 64,
+  },
+  
+  // Layout
+  fullWidth: {
+    width: '100%',
+  },
   
   // Text styles
   text: {
@@ -117,14 +138,20 @@ const styles = StyleSheet.create({
   secondaryText: {
     color: Colors.text.primary,
   },
+  accentText: {
+    color: Colors.text.inverse,
+  },
   outlineText: {
-    color: Colors.primary[500],
+    color: Colors.primary[600],
   },
   ghostText: {
-    color: Colors.primary[500],
+    color: Colors.primary[600],
   },
   
   // Size text
+  xsText: {
+    fontSize: Typography.fontSize.xs,
+  },
   smText: {
     fontSize: Typography.fontSize.sm,
   },
@@ -133,6 +160,9 @@ const styles = StyleSheet.create({
   },
   lgText: {
     fontSize: Typography.fontSize.lg,
+  },
+  xlText: {
+    fontSize: Typography.fontSize.xl,
   },
   
   // States

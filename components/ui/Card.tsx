@@ -1,12 +1,14 @@
 import React from 'react';
-import { View, StyleSheet, ViewStyle } from 'react-native';
-import { Colors, BorderRadius, Shadows } from '@/constants/design';
+import { View, StyleSheet, ViewStyle, TouchableOpacity } from 'react-native';
+import { Colors, BorderRadius, Shadows, Spacing } from '@/constants/design';
 
 interface CardProps {
   children: React.ReactNode;
-  variant?: 'default' | 'elevated' | 'outlined';
-  padding?: 'none' | 'sm' | 'md' | 'lg';
+  variant?: 'default' | 'elevated' | 'outlined' | 'glass' | 'gradient';
+  padding?: 'none' | 'xs' | 'sm' | 'md' | 'lg' | 'xl';
   style?: ViewStyle;
+  onPress?: () => void;
+  disabled?: boolean;
 }
 
 export const Card: React.FC<CardProps> = ({
@@ -14,18 +16,28 @@ export const Card: React.FC<CardProps> = ({
   variant = 'default',
   padding = 'md',
   style,
+  onPress,
+  disabled = false,
 }) => {
   const cardStyle = [
     styles.base,
     styles[variant],
     styles[padding],
+    disabled && { opacity: 0.6 },
     style,
   ];
 
+  const CardComponent = onPress ? TouchableOpacity : View;
+  
   return (
-    <View style={cardStyle}>
+    <CardComponent 
+      style={cardStyle}
+      onPress={onPress}
+      disabled={disabled}
+      activeOpacity={onPress ? 0.95 : 1}
+    >
       {children}
-    </View>
+    </CardComponent>
   );
 };
 
@@ -44,22 +56,40 @@ const styles = StyleSheet.create({
   },
   outlined: {
     borderWidth: 1,
-    borderColor: Colors.neutral[200],
+    borderColor: Colors.border.medium,
     shadowOpacity: 0,
     elevation: 0,
+  },
+  glass: {
+    backgroundColor: Colors.background.glass,
+    ...Shadows.glass,
+    borderWidth: 1,
+    borderColor: Colors.border.light,
+  },
+  gradient: {
+    backgroundColor: Colors.accent[50],
+    borderWidth: 1,
+    borderColor: Colors.accent[200],
+    ...Shadows.md,
   },
   
   // Padding
   none: {
     padding: 0,
   },
+  xs: {
+    padding: Spacing.sm,
+  },
   sm: {
-    padding: 12,
+    padding: Spacing.md,
   },
   md: {
-    padding: 20,
+    padding: Spacing.xl,
   },
   lg: {
-    padding: 24,
+    padding: Spacing['2xl'],
+  },
+  xl: {
+    padding: Spacing['3xl'],
   },
 });
