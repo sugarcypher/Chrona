@@ -363,12 +363,273 @@ export default function ItineraryPlannerScreen() {
               <Text style={styles.quickActionText}>Auto Schedule</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.quickActionButton}>
+            <TouchableOpacity 
+              style={styles.quickActionButton}
+              onPress={() => {
+                if (itinerary.length === 0) {
+                  Alert.alert('No Schedule', 'Create a schedule first to optimize it.');
+                  return;
+                }
+                
+                Alert.alert(
+                  'Optimize Schedule',
+                  'Choose optimization strategy:',
+                  [
+                    { 
+                      text: 'Minimize Context Switches', 
+                      onPress: () => {
+                        // Group similar tasks together
+                        const optimized = [...itinerary].sort((a, b) => {
+                          if (a.type !== b.type) return a.type.localeCompare(b.type);
+                          return a.priority === b.priority ? 0 : a.priority === 'high' ? -1 : 1;
+                        });
+                        
+                        // Update start times
+                        let currentTime = new Date(selectedDate);
+                        currentTime.setHours(workingHours.start, 0, 0, 0);
+                        
+                        optimized.forEach(item => {
+                          item.startTime = new Date(currentTime);
+                          currentTime.setMinutes(currentTime.getMinutes() + item.duration);
+                        });
+                        
+                        setItinerary(optimized);
+                        Alert.alert('Optimized', 'Schedule optimized to minimize context switches.');
+                      }
+                    },
+                    { 
+                      text: 'Energy-Based Ordering', 
+                      onPress: () => {
+                        // High energy tasks first, then medium, then low
+                        const optimized = [...itinerary].sort((a, b) => {
+                          const priorityOrder = { high: 3, medium: 2, low: 1 };
+                          return priorityOrder[b.priority] - priorityOrder[a.priority];
+                        });
+                        
+                        // Update start times
+                        let currentTime = new Date(selectedDate);
+                        currentTime.setHours(workingHours.start, 0, 0, 0);
+                        
+                        optimized.forEach(item => {
+                          item.startTime = new Date(currentTime);
+                          currentTime.setMinutes(currentTime.getMinutes() + item.duration);
+                        });
+                        
+                        setItinerary(optimized);
+                        Alert.alert('Optimized', 'Schedule optimized based on energy levels.');
+                      }
+                    },
+                    { 
+                      text: 'Time-Based Optimization', 
+                      onPress: () => {
+                        // Shortest tasks first to build momentum
+                        const optimized = [...itinerary].sort((a, b) => a.duration - b.duration);
+                        
+                        // Update start times
+                        let currentTime = new Date(selectedDate);
+                        currentTime.setHours(workingHours.start, 0, 0, 0);
+                        
+                        optimized.forEach(item => {
+                          item.startTime = new Date(currentTime);
+                          currentTime.setMinutes(currentTime.getMinutes() + item.duration);
+                        });
+                        
+                        setItinerary(optimized);
+                        Alert.alert('Optimized', 'Schedule optimized by task duration.');
+                      }
+                    },
+                    { text: 'Cancel', style: 'cancel' }
+                  ]
+                );
+              }}
+            >
               <Shuffle size={20} color="#6366F1" />
               <Text style={styles.quickActionText}>Optimize</Text>
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.quickActionButton}>
+            <TouchableOpacity 
+              style={styles.quickActionButton}
+              onPress={() => {
+                Alert.alert(
+                  'Schedule Templates',
+                  'Choose a pre-built schedule template:',
+                  [
+                    {
+                      text: 'Deep Work Day',
+                      onPress: () => {
+                        const template: ItineraryItem[] = [
+                          {
+                            id: 'template-1',
+                            title: 'Morning Deep Work Block',
+                            startTime: new Date(selectedDate.setHours(9, 0, 0, 0)),
+                            duration: 120,
+                            type: 'task',
+                            priority: 'high',
+                            flexible: false,
+                          },
+                          {
+                            id: 'template-2',
+                            title: 'Break & Movement',
+                            startTime: new Date(selectedDate.setHours(11, 0, 0, 0)),
+                            duration: 15,
+                            type: 'break',
+                            priority: 'low',
+                            flexible: true,
+                          },
+                          {
+                            id: 'template-3',
+                            title: 'Administrative Tasks',
+                            startTime: new Date(selectedDate.setHours(11, 15, 0, 0)),
+                            duration: 45,
+                            type: 'task',
+                            priority: 'medium',
+                            flexible: true,
+                          },
+                          {
+                            id: 'template-4',
+                            title: 'Lunch Break',
+                            startTime: new Date(selectedDate.setHours(12, 0, 0, 0)),
+                            duration: 60,
+                            type: 'break',
+                            priority: 'low',
+                            flexible: false,
+                          },
+                          {
+                            id: 'template-5',
+                            title: 'Afternoon Focus Block',
+                            startTime: new Date(selectedDate.setHours(13, 0, 0, 0)),
+                            duration: 90,
+                            type: 'task',
+                            priority: 'high',
+                            flexible: false,
+                          },
+                        ];
+                        setItinerary(template);
+                        Alert.alert('Template Applied', 'Deep Work Day template has been applied.');
+                      }
+                    },
+                    {
+                      text: 'Meeting Heavy Day',
+                      onPress: () => {
+                        const template: ItineraryItem[] = [
+                          {
+                            id: 'template-1',
+                            title: 'Morning Prep',
+                            startTime: new Date(selectedDate.setHours(9, 0, 0, 0)),
+                            duration: 30,
+                            type: 'task',
+                            priority: 'medium',
+                            flexible: true,
+                          },
+                          {
+                            id: 'template-2',
+                            title: 'Team Standup',
+                            startTime: new Date(selectedDate.setHours(9, 30, 0, 0)),
+                            duration: 30,
+                            type: 'meeting',
+                            priority: 'high',
+                            flexible: false,
+                          },
+                          {
+                            id: 'template-3',
+                            title: 'Project Review Meeting',
+                            startTime: new Date(selectedDate.setHours(10, 30, 0, 0)),
+                            duration: 60,
+                            type: 'meeting',
+                            priority: 'high',
+                            flexible: false,
+                          },
+                          {
+                            id: 'template-4',
+                            title: 'Quick Tasks',
+                            startTime: new Date(selectedDate.setHours(11, 30, 0, 0)),
+                            duration: 30,
+                            type: 'task',
+                            priority: 'medium',
+                            flexible: true,
+                          },
+                          {
+                            id: 'template-5',
+                            title: 'Client Call',
+                            startTime: new Date(selectedDate.setHours(14, 0, 0, 0)),
+                            duration: 45,
+                            type: 'meeting',
+                            priority: 'high',
+                            flexible: false,
+                          },
+                        ];
+                        setItinerary(template);
+                        Alert.alert('Template Applied', 'Meeting Heavy Day template has been applied.');
+                      }
+                    },
+                    {
+                      text: 'Balanced Productivity',
+                      onPress: () => {
+                        const template: ItineraryItem[] = [
+                          {
+                            id: 'template-1',
+                            title: 'Morning Focus Time',
+                            startTime: new Date(selectedDate.setHours(9, 0, 0, 0)),
+                            duration: 90,
+                            type: 'task',
+                            priority: 'high',
+                            flexible: false,
+                          },
+                          {
+                            id: 'template-2',
+                            title: 'Coffee Break',
+                            startTime: new Date(selectedDate.setHours(10, 30, 0, 0)),
+                            duration: 15,
+                            type: 'break',
+                            priority: 'low',
+                            flexible: true,
+                          },
+                          {
+                            id: 'template-3',
+                            title: 'Email & Communications',
+                            startTime: new Date(selectedDate.setHours(10, 45, 0, 0)),
+                            duration: 30,
+                            type: 'task',
+                            priority: 'medium',
+                            flexible: true,
+                          },
+                          {
+                            id: 'template-4',
+                            title: 'Creative Work',
+                            startTime: new Date(selectedDate.setHours(11, 15, 0, 0)),
+                            duration: 75,
+                            type: 'task',
+                            priority: 'high',
+                            flexible: true,
+                          },
+                          {
+                            id: 'template-5',
+                            title: 'Lunch & Walk',
+                            startTime: new Date(selectedDate.setHours(12, 30, 0, 0)),
+                            duration: 45,
+                            type: 'break',
+                            priority: 'low',
+                            flexible: false,
+                          },
+                          {
+                            id: 'template-6',
+                            title: 'Afternoon Tasks',
+                            startTime: new Date(selectedDate.setHours(13, 15, 0, 0)),
+                            duration: 60,
+                            type: 'task',
+                            priority: 'medium',
+                            flexible: true,
+                          },
+                        ];
+                        setItinerary(template);
+                        Alert.alert('Template Applied', 'Balanced Productivity template has been applied.');
+                      }
+                    },
+                    { text: 'Cancel', style: 'cancel' }
+                  ]
+                );
+              }}
+            >
               <Calendar size={20} color="#6366F1" />
               <Text style={styles.quickActionText}>Templates</Text>
             </TouchableOpacity>
@@ -447,7 +708,7 @@ export default function ItineraryPlannerScreen() {
 
         {/* Itinerary */}
         <View style={styles.itineraryCard}>
-          <Text style={styles.sectionTitle}>Today's Itinerary</Text>
+          <Text style={styles.sectionTitle}>Today&apos;s Itinerary</Text>
           
           {itinerary.length === 0 ? (
             <View style={styles.emptyState}>

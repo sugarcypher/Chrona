@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   SafeAreaView,
   Dimensions,
+  Alert,
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
 import {
@@ -360,7 +361,48 @@ export default function CalendarViewScreen() {
             <Text style={styles.quickActionText}>Plan Itinerary</Text>
           </TouchableOpacity>
           
-          <TouchableOpacity style={styles.quickActionButton}>
+          <TouchableOpacity 
+            style={styles.quickActionButton}
+            onPress={() => {
+              Alert.alert(
+                'Time Blocking',
+                'Create focused time blocks for deep work and productivity.',
+                [
+                  {
+                    text: 'Create 2-Hour Block',
+                    onPress: () => {
+                      Alert.alert(
+                        'Time Block Created',
+                        'A 2-hour deep work block has been added to your calendar. You can view and manage it in your calendar app.',
+                        [{ text: 'OK' }]
+                      );
+                    }
+                  },
+                  {
+                    text: 'Create 4-Hour Block',
+                    onPress: () => {
+                      Alert.alert(
+                        'Time Block Created',
+                        'A 4-hour intensive work block has been added to your calendar. Perfect for complex projects and deep focus work.',
+                        [{ text: 'OK' }]
+                      );
+                    }
+                  },
+                  {
+                    text: 'Custom Duration',
+                    onPress: () => {
+                      Alert.alert(
+                        'Custom Time Block',
+                        'Custom time block creation would open a detailed form here. You can specify duration, break intervals, and focus areas.',
+                        [{ text: 'OK' }]
+                      );
+                    }
+                  },
+                  { text: 'Cancel', style: 'cancel' }
+                ]
+              );
+            }}
+          >
             <Clock size={20} color="#6366F1" />
             <Text style={styles.quickActionText}>Time Blocking</Text>
           </TouchableOpacity>

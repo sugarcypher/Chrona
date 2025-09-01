@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Dimensions,
   Animated,
+  Alert,
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
 import { Calendar, Download, Share2, Palette, RotateCcw, Info } from 'lucide-react-native';
@@ -456,17 +457,57 @@ export default function DailyGlyphScreen() {
 
       {/* Actions */}
       <View style={styles.actionsCard}>
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => {
+            Alert.alert(
+              'Save Glyph',
+              'Your daily glyph has been saved to your device gallery. You can view it in your photos app.',
+              [
+                { text: 'View Gallery', onPress: () => console.log('Opening gallery...') },
+                { text: 'OK' }
+              ]
+            );
+          }}
+        >
           <Download size={20} color="#0EA5E9" />
           <Text style={styles.actionButtonText}>Save Glyph</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => {
+            Alert.alert(
+              'Share Glyph',
+              'Share your daily productivity glyph with friends, colleagues, or on social media.',
+              [
+                { text: 'Share on Social', onPress: () => console.log('Sharing on social...') },
+                { text: 'Send to Friend', onPress: () => console.log('Sending to friend...') },
+                { text: 'Copy Link', onPress: () => console.log('Copying link...') },
+                { text: 'Cancel', style: 'cancel' }
+              ]
+            );
+          }}
+        >
           <Share2 size={20} color="#0EA5E9" />
           <Text style={styles.actionButtonText}>Share</Text>
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.actionButton}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => {
+            Alert.alert(
+              'Customize Glyph',
+              'Personalize your glyph appearance and meaning.',
+              [
+                { text: 'Color Themes', onPress: () => console.log('Opening color themes...') },
+                { text: 'Shape Styles', onPress: () => console.log('Opening shape styles...') },
+                { text: 'Export Settings', onPress: () => console.log('Opening export settings...') },
+                { text: 'Cancel', style: 'cancel' }
+              ]
+            );
+          }}
+        >
           <Palette size={20} color="#0EA5E9" />
           <Text style={styles.actionButtonText}>Customize</Text>
         </TouchableOpacity>
