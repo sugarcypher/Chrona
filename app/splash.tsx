@@ -8,10 +8,11 @@ import {
   Animated,
   Dimensions,
   SafeAreaView,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Shield, Clock, Eye, Lock, CheckCircle, ArrowRight } from 'lucide-react-native';
+import { Shield, Eye, Lock, CheckCircle, ArrowRight } from 'lucide-react-native';
 
 const { width, height } = Dimensions.get('window');
 
@@ -54,7 +55,7 @@ export default function SplashScreen() {
     try {
       const hasLaunched = await AsyncStorage.getItem('chrona_has_launched');
       if (hasLaunched) {
-        router.replace('/metrology');
+        router.replace('/(tabs)/metrology');
       }
     } catch (error) {
       console.error('Error checking first launch:', error);
@@ -80,7 +81,7 @@ export default function SplashScreen() {
         version: '1.0.0',
       }));
       
-      router.replace('/metrology');
+      router.replace('/(tabs)/metrology');
     } catch (error) {
       console.error('Error saving consent:', error);
     }
@@ -89,7 +90,11 @@ export default function SplashScreen() {
   const renderWelcome = () => (
     <View style={styles.stepContainer}>
       <View style={styles.logoContainer}>
-        <Clock size={64} color="#0EA5E9" />
+        <Image 
+          source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/pccgpiz7zxqjefsgmiwkd' }}
+          style={styles.logoImage}
+          resizeMode="contain"
+        />
         <Text style={styles.logoText}>Chrona</Text>
         <Text style={styles.tagline}>Time Metrology for Human Flourishing</Text>
       </View>
@@ -249,6 +254,10 @@ const styles = StyleSheet.create({
   logoContainer: {
     alignItems: 'center',
     marginTop: 60,
+  },
+  logoImage: {
+    width: 80,
+    height: 80,
   },
   logoText: {
     fontSize: 48,
