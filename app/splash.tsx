@@ -9,6 +9,7 @@ import {
   SafeAreaView,
   Dimensions,
   Platform,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -309,24 +310,18 @@ export default function SplashScreen() {
           {
             transform: [
               { scale: scaleAnim },
-              { 
-                rotate: rotateAnim.interpolate({
-                  inputRange: [0, 1],
-                  outputRange: ['0deg', '360deg'],
-                })
-              }
             ],
             opacity: fadeAnim,
           }
         ]}>
-          <LinearGradient
-            colors={[Colors.accent[500], Colors.accent[700]]}
-            style={styles.logoGradient}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-          >
-            <Timer size={48} color={Colors.background.primary} strokeWidth={1.5} />
-          </LinearGradient>
+          <View style={styles.logoImageContainer}>
+            <Image 
+              source={require('@/assets/images/icon.png')} 
+              style={styles.logoImage}
+              resizeMode="contain"
+            />
+            <View style={styles.logoGlow} />
+          </View>
           
           <View style={styles.logoRing} />
           <View style={[styles.logoRing, styles.logoRingOuter]} />
@@ -340,10 +335,7 @@ export default function SplashScreen() {
           }
         ]}>
           <Text style={styles.logoText}>Chrona</Text>
-          <View style={styles.taglineContainer}>
-            <Text style={styles.tagline}>Time Metrology for Human Flourishing</Text>
-            <View style={styles.taglineUnderline} />
-          </View>
+          <Text style={styles.tagline}>Time Metrology for Human Flourishing</Text>
         </Animated.View>
       </View>
       
@@ -566,54 +558,67 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: Spacing['6xl'],
+    marginTop: Spacing['4xl'],
     zIndex: 2,
   },
   logoWrapper: {
-    width: 140,
-    height: 140,
+    width: 160,
+    height: 160,
     justifyContent: 'center',
     alignItems: 'center',
     position: 'relative',
+    marginBottom: Spacing['2xl'],
   },
-  logoGradient: {
-    width: 100,
-    height: 100,
-    borderRadius: 50,
+  logoImageContainer: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
     justifyContent: 'center',
     alignItems: 'center',
-    ...Shadows.glass,
+    backgroundColor: Colors.background.primary,
+    position: 'relative',
+    ...Shadows.xl,
   },
-  logoRing: {
+  logoImage: {
+    width: 80,
+    height: 80,
+    zIndex: 2,
+  },
+  logoGlow: {
     position: 'absolute',
     width: 120,
     height: 120,
     borderRadius: 60,
-    borderWidth: 1,
-    borderColor: `${Colors.accent[400]}40`,
+    backgroundColor: Colors.accent[500],
+    opacity: 0.1,
+    zIndex: 1,
   },
-  logoRingOuter: {
+  logoRing: {
+    position: 'absolute',
     width: 140,
     height: 140,
     borderRadius: 70,
-    borderColor: `${Colors.accent[300]}20`,
+    borderWidth: 1,
+    borderColor: `${Colors.accent[400]}30`,
+  },
+  logoRingOuter: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    borderColor: `${Colors.accent[300]}15`,
   },
   brandContainer: {
     alignItems: 'center',
-    marginTop: Spacing['3xl'],
   },
   logoText: {
-    fontSize: Typography.fontSize['5xl'],
-    fontWeight: Typography.fontWeight.extrabold,
+    fontSize: 48,
+    fontWeight: '800' as const,
     color: Colors.text.inverse,
-    letterSpacing: Typography.letterSpacing.tight,
-    textShadowColor: `${Colors.accent[500]}60`,
-    textShadowOffset: { width: 0, height: 4 },
-    textShadowRadius: 12,
-  },
-  taglineContainer: {
-    alignItems: 'center',
-    marginTop: Spacing.md,
+    letterSpacing: -1,
+    textShadowColor: `${Colors.accent[500]}40`,
+    textShadowOffset: { width: 0, height: 2 },
+    textShadowRadius: 8,
+    marginBottom: Spacing.md,
   },
   tagline: {
     fontSize: Typography.fontSize.lg,
@@ -622,26 +627,20 @@ const styles = StyleSheet.create({
     letterSpacing: Typography.letterSpacing.wide,
     fontWeight: Typography.fontWeight.medium,
   },
-  taglineUnderline: {
-    width: 60,
-    height: 2,
-    backgroundColor: Colors.accent[500],
-    marginTop: Spacing.sm,
-    borderRadius: 1,
-  },
   descriptionContainer: {
     flex: 1,
     justifyContent: 'center',
-    paddingVertical: Spacing['5xl'],
+    paddingVertical: Spacing['3xl'],
     zIndex: 2,
   },
   description: {
-    fontSize: Typography.fontSize.xl,
+    fontSize: Typography.fontSize.lg,
     color: Colors.primary[200],
-    lineHeight: Typography.lineHeight.relaxed * Typography.fontSize.xl,
+    lineHeight: 28,
     textAlign: 'center',
-    marginBottom: Spacing['5xl'],
+    marginBottom: Spacing['4xl'],
     fontWeight: Typography.fontWeight.medium,
+    paddingHorizontal: Spacing.md,
   },
   featureGrid: {
     flexDirection: 'row',
