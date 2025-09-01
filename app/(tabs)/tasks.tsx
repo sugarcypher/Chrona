@@ -29,9 +29,16 @@ import {
   ExternalLink,
   Settings,
   Import,
+  TrendingUp,
+  Activity,
+  MoreHorizontal,
 } from 'lucide-react-native';
 import { Task } from '@/types/chrona';
 import { router } from 'expo-router';
+import { Colors, Typography, Spacing, BorderRadius, Shadows, Layout } from '@/constants/design';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 type FilterType = 'all' | 'today' | 'upcoming' | 'completed' | 'active';
 type ViewType = 'list' | 'calendar' | 'timeline';
@@ -163,70 +170,111 @@ export default function TasksScreen() {
     const StatusIcon = getTaskStatusIcon(task);
     const statusColor = getTaskStatusColor(task);
     const progress = task.actualMinutes / task.estimatedMinutes;
+    const isActive = activeTask?.id === task.id;
+    const isCompleted = !!task.completedAt;
+    const isOverdue = progress > 1.2;
 
     return (
-      <View key={task.id} style={styles.taskItem}>
-        <TouchableOpacity
-          style={[styles.taskStatus, { backgroundColor: statusColor }]}
-          onPress={() => handleTaskAction(task)}
-        >
-          <StatusIcon size={16} color="#FFFFFF" />
-        </TouchableOpacity>
-        
-        <View style={styles.taskContent}>
-          <Text style={[styles.taskTitle, task.completedAt && styles.completedTask]}>
-            {task.title}
-          </Text>
+      <Card key={task.id} style={[styles.taskCard, isActive && styles.activeTaskCard]}>
+        <View style={styles.taskHeader}>
+          <TouchableOpacity
+            style={[styles.taskStatus, { backgroundColor: statusColor }]}
+            onPress={() => handleTaskAction(task)}
+          >
+            <StatusIcon size={16} color={Colors.text.inverse} />
+          </TouchableOpacity>
           
-          <View style={styles.taskMeta}>
-            <View style={styles.taskMetaItem}>
-              <Clock size={12} color="#6B7280" />
-              <Text style={styles.taskMetaText}>
-                {task.estimatedMinutes}m est.
-              </Text>
+          <View style={styles.taskTitleContainer}>
+            <Text style={[styles.taskTitle, isCompleted && styles.completedTask]}>
+              {task.title}
+            </Text>
+            <View style={styles.taskBadges}>
+              {isActive && <Badge text="Active" variant="primary" size="sm" />}
+              {isCompleted && <Badge text="Completed" variant="success" size="sm" />}
+              {isOverdue && !isCompleted && <Badge text="Overdue" variant="error" size="sm" />}
             </View>
-            
-            {task.actualMinutes > 0 && (
-              <View style={styles.taskMetaItem}>
-                <Timer size={12} color="#6B7280" />
-                <Text style={styles.taskMetaText}>
-                  {task.actualMinutes}m actual
-                </Text>
-              </View>
-            )}
-            
-            {task.startedAt && !task.completedAt && (
-              <View style={styles.taskMetaItem}>
-                <Zap size={12} color="#3B82F6" />
-                <Text style={[styles.taskMetaText, { color: '#3B82F6' }]}>Active</Text>
-              </View>
-            )}
+          </View>
+          
+          <TouchableOpacity style={styles.taskMenu}>
+            <MoreHorizontal size={16} color={Colors.neutral[400]} />
+          </TouchableOpacity>
+        </View>
+        
+        <View style={styles.taskMeta}>
+          <View style={styles.taskMetaItem}>
+            <Clock size={12} color={Colors.neutral[500]} />
+            <Text style={styles.taskMetaText}>
+              {task.estimatedMinutes}m estimated
+            </Text>
           </View>
           
           {task.actualMinutes > 0 && (
+            <View style={styles.taskMetaItem}>
+              <Timer size={12} color={Colors.neutral[500]} />
+              <Text style={styles.taskMetaText}>
+                {task.actualMinutes}m actual
+              </Text>
+            </View>
+          )}
+          
+          <View style={styles.taskMetaItem}>
+            <Target size={12} color={Colors.neutral[500]} />
+            <Text style={styles.taskMetaText}>
+              {Math.round(task.satisficingThreshold * 100)}% threshold
+            </Text>
+          </View>
+        </View>
+        
+        {task.actualMinutes > 0 && (
+          <View style={styles.progressContainer}>
             <View style={styles.progressBar}>
               <View 
                 style={[
                   styles.progressFill,
                   { 
                     width: `${Math.min(progress * 100, 100)}%`,
-                    backgroundColor: progress > 1.2 ? '#EF4444' : progress > 0.8 ? '#10B981' : '#3B82F6'
+                    backgroundColor: isOverdue ? Colors.error[500] : progress > 0.8 ? Colors.success[500] : Colors.primary[500]
                   }
                 ]}
               />
             </View>
-          )}
-        </View>
-        
-        {!task.completedAt && task.startedAt && (
-          <TouchableOpacity
-            style={styles.completeButton}
-            onPress={() => handleCompleteTask(task)}
-          >
-            <CheckCircle size={20} color="#10B981" />
-          </TouchableOpacity>
+            <Text style={styles.progressText}>
+              {Math.round(progress * 100)}%
+            </Text>
+          </View>
         )}
-      </View>
+        
+        <View style={styles.taskActions}>
+          {!isCompleted && (
+            <>
+              <Button
+                title={isActive ? "Pause" : "Start"}
+                onPress={() => handleTaskAction(task)}
+                variant={isActive ? "secondary" : "primary"}
+                size="sm"
+                icon={isActive ? <Pause size={14} color={Colors.text.primary} /> : <Play size={14} color={Colors.text.inverse} />}
+              />
+              {task.startedAt && (
+                <Button
+                  title="Complete"
+                  onPress={() => handleCompleteTask(task)}
+                  variant="outline"
+                  size="sm"
+                  icon={<CheckCircle size={14} color={Colors.success[500]} />}
+                />
+              )}
+            </>
+          )}
+          
+          <TouchableOpacity 
+            style={styles.taskDetailButton}
+            onPress={() => router.push(`/task-detail?id=${task.id}`)}
+          >
+            <Text style={styles.taskDetailText}>Details</Text>
+            <TrendingUp size={12} color={Colors.primary[500]} />
+          </TouchableOpacity>
+        </View>
+      </Card>
     );
   };
 
@@ -357,14 +405,14 @@ export default function TasksScreen() {
             style={styles.headerButton}
             onPress={() => router.push('/calendar-view')}
           >
-            <CalendarDays size={20} color="#6366F1" />
+            <CalendarDays size={20} color={Colors.primary[500]} />
           </TouchableOpacity>
           
           <TouchableOpacity 
             style={styles.headerButton}
             onPress={() => setShowCreateModal(true)}
           >
-            <Plus size={20} color="#6366F1" />
+            <Plus size={20} color={Colors.primary[500]} />
           </TouchableOpacity>
         </View>
       </View>
@@ -642,7 +690,7 @@ export default function TasksScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#FAFAFA',
+    backgroundColor: Colors.background.secondary,
   },
   header: {
     flexDirection: 'row',
@@ -1027,5 +1075,61 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#6B7280',
     lineHeight: 20,
+  },
+  
+  // New Task Card Styles
+  taskCard: {
+    marginBottom: Spacing.md,
+  },
+  activeTaskCard: {
+    borderWidth: 2,
+    borderColor: Colors.primary[500],
+  },
+  taskHeader: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: Spacing.md,
+  },
+  taskTitleContainer: {
+    flex: 1,
+    marginLeft: Spacing.md,
+  },
+  taskBadges: {
+    flexDirection: 'row',
+    gap: Spacing.xs,
+    marginTop: Spacing.xs,
+  },
+  taskMenu: {
+    padding: Spacing.xs,
+  },
+  progressContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
+    gap: Spacing.sm,
+  },
+  progressText: {
+    fontSize: Typography.fontSize.xs,
+    fontWeight: Typography.fontWeight.semibold,
+    color: Colors.text.secondary,
+    minWidth: 35,
+  },
+  taskActions: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    gap: Spacing.sm,
+  },
+  taskDetailButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: Spacing.xs,
+    paddingVertical: Spacing.xs,
+    paddingHorizontal: Spacing.sm,
+  },
+  taskDetailText: {
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.medium,
+    color: Colors.primary[500],
   },
 });

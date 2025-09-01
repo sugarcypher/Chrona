@@ -7,11 +7,16 @@ import {
   Dimensions,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
 import { LineChart, BarChart } from 'react-native-chart-kit';
 import { Platform } from 'react-native';
-import { Info, TrendingUp, Clock, Target, Zap } from 'lucide-react-native';
+import { Info, TrendingUp, Clock, Target, Zap, BarChart3, Activity, Brain, Download, Share } from 'lucide-react-native';
+import { Colors, Typography, Spacing, BorderRadius, Shadows, Layout } from '@/constants/design';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -81,13 +86,56 @@ export default function MetrologyScreen() {
     };
   }, [timeBlocks]);
 
+  const handleExportData = () => {
+    Alert.alert(
+      'Export Analytics Data',
+      'Choose your export format for temporal metrics and insights:',
+      [
+        { text: 'CSV Report', onPress: () => Alert.alert('Export', 'CSV export would generate a comprehensive spreadsheet with all temporal metrics') },
+        { text: 'JSON Data', onPress: () => Alert.alert('Export', 'JSON export would provide raw data for external analysis tools') },
+        { text: 'PDF Summary', onPress: () => Alert.alert('Export', 'PDF export would create a formatted analytics report') },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
+  const handleShareInsights = () => {
+    Alert.alert(
+      'Share Insights',
+      'Share your productivity insights with your team or coach:',
+      [
+        { text: 'Share Summary', onPress: () => Alert.alert('Share', 'Anonymized productivity summary would be shared') },
+        { text: 'Generate Report', onPress: () => Alert.alert('Share', 'Detailed report would be generated for sharing') },
+        { text: 'Cancel', style: 'cancel' },
+      ]
+    );
+  };
+
   return (
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
         <View style={styles.header}>
-          <Text style={styles.headerTitle}>Analytics</Text>
-          <Text style={styles.headerSubtitle}>Your productivity insights</Text>
+          <View>
+            <Text style={styles.headerTitle}>Analytics</Text>
+            <Text style={styles.headerSubtitle}>Enterprise productivity insights</Text>
+          </View>
+          
+          <View style={styles.headerActions}>
+            <TouchableOpacity 
+              style={styles.headerButton}
+              onPress={handleShareInsights}
+            >
+              <Share size={18} color={Colors.primary[500]} />
+            </TouchableOpacity>
+            
+            <TouchableOpacity 
+              style={styles.headerButton}
+              onPress={handleExportData}
+            >
+              <Download size={18} color={Colors.primary[500]} />
+            </TouchableOpacity>
+          </View>
         </View>
         {/* Chrono-Fingerprint */}
         <View style={styles.gradientCard}>
@@ -252,9 +300,25 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   header: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
     paddingHorizontal: 20,
     paddingTop: 20,
     paddingBottom: 16,
+  },
+  headerActions: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  headerButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: Colors.background.primary,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Shadows.sm,
   },
   headerTitle: {
     fontSize: 32,

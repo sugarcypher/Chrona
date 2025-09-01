@@ -16,15 +16,16 @@ function RootLayoutNav() {
     <Stack screenOptions={{ 
       headerBackTitle: "Back",
       headerStyle: {
-        backgroundColor: '#FAFAFA',
-      },
+        backgroundColor: '#FFFFFF',
+      } as any,
       headerTintColor: '#1F2937',
       headerTitleStyle: {
-        fontWeight: '600',
+        fontWeight: '700',
         fontSize: 18,
+        letterSpacing: -0.3,
       },
       contentStyle: {
-        backgroundColor: '#FAFAFA'
+        backgroundColor: '#F8FAFC'
       }
     }}>
       <Stack.Screen name="index" options={{ headerShown: false }} />

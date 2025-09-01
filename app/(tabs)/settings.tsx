@@ -6,6 +6,7 @@ import {
   ScrollView,
   TouchableOpacity,
   SafeAreaView,
+  Alert,
 } from 'react-native';
 import { router } from 'expo-router';
 import {
@@ -21,9 +22,16 @@ import {
   User,
   Settings as SettingsIcon,
   Album as AlertIcon,
+  Building2,
+  Users,
+  Globe,
+  Zap,
 } from 'lucide-react-native';
-import { Alert } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
+import { Colors, Typography, Spacing, BorderRadius, Shadows, Layout } from '@/constants/design';
+import { Card } from '@/components/ui/Card';
+import { Button } from '@/components/ui/Button';
+import { Badge } from '@/components/ui/Badge';
 
 interface SettingsSection {
   title: string;
