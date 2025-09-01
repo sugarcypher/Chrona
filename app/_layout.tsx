@@ -65,6 +65,20 @@ function RootLayoutNav() {
           presentation: "modal"
         }} 
       />
+      <Stack.Screen 
+        name="calendar-view" 
+        options={{ 
+          title: "Calendar View",
+          presentation: "modal"
+        }} 
+      />
+      <Stack.Screen 
+        name="itinerary-planner" 
+        options={{ 
+          title: "Itinerary Planner",
+          presentation: "modal"
+        }} 
+      />
     </Stack>
   );
 }

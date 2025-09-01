@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router";
-import { Activity, BarChart3, Brain, Clock, Settings } from "lucide-react-native";
+import { Activity, BarChart3, Brain, Clock, Settings, Calendar } from "lucide-react-native";
 import React from "react";
 import { Platform } from "react-native";
 
@@ -49,6 +49,13 @@ export default function TabLayout() {
       }}
     >
 
+      <Tabs.Screen
+        name="tasks"
+        options={{
+          title: "Tasks",
+          tabBarIcon: ({ color }) => <Calendar size={22} color={color} />,
+        }}
+      />
       <Tabs.Screen
         name="metrology"
         options={{
