@@ -6,9 +6,10 @@ import {
   ScrollView,
   TouchableOpacity,
   Alert,
+  SafeAreaView,
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
-import { Heart, Droplets, Move, AlertCircle, Bell, Shield, Target, Clock } from 'lucide-react-native';
+import { Heart, Droplets, Move, AlertCircle, Bell, Shield, Target, Clock, CheckCircle } from 'lucide-react-native';
 import { router } from 'expo-router';
 
 export default function MindsetScreen() {
@@ -99,178 +100,222 @@ export default function MindsetScreen() {
   ];
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Nudge Consent Center */}
-      <View style={styles.header}>
-        <Text style={styles.headerTitle}>Consentful Nudging</Text>
-        <TouchableOpacity onPress={() => router.push('/nudge-ledger' as any)}>
-          <Shield size={24} color="#0EA5E9" />
-        </TouchableOpacity>
-      </View>
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Wellness</Text>
+          <Text style={styles.headerSubtitle}>Mindful productivity insights</Text>
+        </View>
+        {/* Nudge Consent Center */}
+        <View style={styles.nudgeHeader}>
+          <Text style={styles.sectionTitle}>Mindful Nudges</Text>
+          <TouchableOpacity onPress={() => router.push('/nudge-ledger' as any)}>
+            <Shield size={24} color="#6366F1" />
+          </TouchableOpacity>
+        </View>
 
-      <View style={styles.nudgesList}>
-        {nudgeTypes.map((nudge) => {
-          const isConsented = consentedNudges.has(nudge.id);
-          
-          return (
-            <TouchableOpacity
-              key={nudge.id}
-              style={[
-                styles.nudgeCard,
-                isConsented && styles.nudgeCardActive
-              ]}
-              onPress={() => !isConsented && handleNudgeConsent(nudge.id, nudge.mechanism, nudge.tradeoff)}
-            >
-              <View style={[styles.nudgeIcon, { backgroundColor: nudge.color + '20' }]}>
-                <nudge.icon size={24} color={nudge.color} />
-              </View>
-              
-              <View style={styles.nudgeContent}>
-                <View style={styles.nudgeHeader}>
-                  <Text style={styles.nudgeTitle}>{nudge.title}</Text>
-                  {isConsented && (
-                    <View style={styles.consentBadge}>
-                      <Text style={styles.consentBadgeText}>Active</Text>
-                    </View>
+        <View style={styles.nudgesList}>
+          {nudgeTypes.map((nudge) => {
+            const isConsented = consentedNudges.has(nudge.id);
+            
+            return (
+              <TouchableOpacity
+                key={nudge.id}
+                style={[
+                  styles.nudgeCard,
+                  isConsented && styles.nudgeCardActive
+                ]}
+                onPress={() => !isConsented && handleNudgeConsent(nudge.id, nudge.mechanism, nudge.tradeoff)}
+              >
+                <View style={[styles.nudgeIcon, { backgroundColor: nudge.color + '20' }]}>
+                  <nudge.icon size={24} color={nudge.color} />
+                </View>
+                
+                <View style={styles.nudgeContent}>
+                  <View style={styles.nudgeCardHeader}>
+                    <Text style={styles.nudgeTitle}>{nudge.title}</Text>
+                    {isConsented && (
+                      <View style={styles.consentBadge}>
+                        <CheckCircle size={16} color="#10B981" />
+                      </View>
+                    )}
+                  </View>
+                  <Text style={styles.nudgeDescription}>{nudge.description}</Text>
+                  
+                  {!isConsented && (
+                    <TouchableOpacity style={styles.learnMore}>
+                      <Text style={styles.learnMoreText}>Tap to learn mechanism →</Text>
+                    </TouchableOpacity>
                   )}
                 </View>
-                <Text style={styles.nudgeDescription}>{nudge.description}</Text>
-                
-                {!isConsented && (
-                  <TouchableOpacity style={styles.learnMore}>
-                    <Text style={styles.learnMoreText}>Tap to learn mechanism →</Text>
-                  </TouchableOpacity>
-                )}
+              </TouchableOpacity>
+            );
+          })}
+        </View>
+
+        {/* Somatic Awareness */}
+        <View style={styles.somaticCard}>
+          <Text style={styles.sectionTitle}>Somatic Awareness</Text>
+        
+          <View style={styles.somaticMetrics}>
+            <View style={styles.somaticItem}>
+              <Text style={styles.somaticLabel}>Typing Rhythm</Text>
+              <View style={styles.rhythmBar}>
+                <View style={[styles.rhythmFill, { width: '75%', backgroundColor: '#10B981' }]} />
               </View>
-            </TouchableOpacity>
-          );
-        })}
-      </View>
-
-      {/* Somatic Awareness */}
-      <View style={styles.somaticCard}>
-        <Text style={styles.cardTitle}>Somatic Awareness</Text>
-        
-        <View style={styles.somaticMetrics}>
-          <View style={styles.somaticItem}>
-            <Text style={styles.somaticLabel}>Typing Rhythm</Text>
-            <View style={styles.rhythmBar}>
-              <View style={[styles.rhythmFill, { width: '75%' }]} />
+              <Text style={[styles.somaticValue, { color: '#10B981' }]}>Steady</Text>
             </View>
-            <Text style={styles.somaticValue}>Steady</Text>
-          </View>
-          
-          <View style={styles.somaticItem}>
-            <Text style={styles.somaticLabel}>Break Frequency</Text>
-            <View style={styles.rhythmBar}>
-              <View style={[styles.rhythmFill, { width: '40%', backgroundColor: '#F59E0B' }]} />
+            
+            <View style={styles.somaticItem}>
+              <Text style={styles.somaticLabel}>Break Frequency</Text>
+              <View style={styles.rhythmBar}>
+                <View style={[styles.rhythmFill, { width: '40%', backgroundColor: '#F59E0B' }]} />
+              </View>
+              <Text style={[styles.somaticValue, { color: '#F59E0B' }]}>Low</Text>
             </View>
-            <Text style={styles.somaticValue}>Low</Text>
-          </View>
-          
-          <View style={styles.somaticItem}>
-            <Text style={styles.somaticLabel}>Focus Fatigue</Text>
-            <View style={styles.rhythmBar}>
-              <View style={[styles.rhythmFill, { width: '60%', backgroundColor: '#0EA5E9' }]} />
+            
+            <View style={styles.somaticItem}>
+              <Text style={styles.somaticLabel}>Focus Fatigue</Text>
+              <View style={styles.rhythmBar}>
+                <View style={[styles.rhythmFill, { width: '60%', backgroundColor: '#3B82F6' }]} />
+              </View>
+              <Text style={[styles.somaticValue, { color: '#3B82F6' }]}>Moderate</Text>
             </View>
-            <Text style={styles.somaticValue}>Moderate</Text>
           </View>
         </View>
-      </View>
 
-      {/* Micro-Prompts */}
-      <View style={styles.promptsCard}>
-        <Text style={styles.cardTitle}>Active Micro-Prompts</Text>
+        {/* Micro-Prompts */}
+        <View style={styles.promptsCard}>
+          <Text style={styles.sectionTitle}>Active Micro-Prompts</Text>
         
-        <View style={styles.promptsList}>
-          <View style={styles.promptItem}>
-            <Bell size={16} color="#10B981" />
-            <Text style={styles.promptText}>Stand and stretch in 15 min</Text>
-          </View>
-          <View style={styles.promptItem}>
-            <Bell size={16} color="#0EA5E9" />
-            <Text style={styles.promptText}>Hydration check at task end</Text>
-          </View>
-          <View style={styles.promptItem}>
-            <Bell size={16} color="#F59E0B" />
-            <Text style={styles.promptText}>Eye rest: 20-20-20 rule active</Text>
+          <View style={styles.promptsList}>
+            <View style={styles.promptItem}>
+              <View style={[styles.promptIcon, { backgroundColor: '#ECFDF5' }]}>
+                <Bell size={16} color="#10B981" />
+              </View>
+              <Text style={styles.promptText}>Stand and stretch in 15 min</Text>
+            </View>
+            <View style={styles.promptItem}>
+              <View style={[styles.promptIcon, { backgroundColor: '#EFF6FF' }]}>
+                <Bell size={16} color="#3B82F6" />
+              </View>
+              <Text style={styles.promptText}>Hydration check at task end</Text>
+            </View>
+            <View style={styles.promptItem}>
+              <View style={[styles.promptIcon, { backgroundColor: '#FEF3C7' }]}>
+                <Bell size={16} color="#F59E0B" />
+              </View>
+              <Text style={styles.promptText}>Eye rest: 20-20-20 rule active</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Regret Minimization */}
-      <View style={styles.regretCard}>
-        <Text style={styles.cardTitle}>Regret Minimization Mode</Text>
-        <Text style={styles.regretDescription}>
-          When behind schedule, suggests tasks that minimize end-of-day regret
-        </Text>
-        
-        <TouchableOpacity 
-          style={[
-            styles.regretToggle,
-            nudgeSettings.regretMinimization && styles.regretToggleActive
-          ]}
-          onPress={() => updateNudgeSettings({ regretMinimization: !nudgeSettings.regretMinimization })}
-        >
-          <Text style={styles.regretToggleText}>
-            {nudgeSettings.regretMinimization ? 'Enabled' : 'Enable Mode'}
+        {/* Regret Minimization */}
+        <View style={styles.regretCard}>
+          <Text style={styles.sectionTitle}>Regret Minimization Mode</Text>
+          <Text style={styles.regretDescription}>
+            When behind schedule, suggests tasks that minimize end-of-day regret
           </Text>
-        </TouchableOpacity>
         
-        {nudgeSettings.regretMinimization && regretMinimizationSuggestions.length > 0 && (
-          <View style={styles.suggestionsContainer}>
-            <Text style={styles.suggestionsTitle}>Regret-Minimizing Next Actions:</Text>
-            {regretMinimizationSuggestions.map((task, index) => (
-              <View key={task.id} style={styles.suggestionItem}>
-                <View style={styles.suggestionRank}>
-                  <Text style={styles.suggestionRankText}>{index + 1}</Text>
+          <TouchableOpacity 
+            style={[
+              styles.regretToggle,
+              nudgeSettings.regretMinimization && styles.regretToggleActive
+            ]}
+            onPress={() => updateNudgeSettings({ regretMinimization: !nudgeSettings.regretMinimization })}
+          >
+            <Text style={[
+              styles.regretToggleText,
+              nudgeSettings.regretMinimization && styles.regretToggleTextActive
+            ]}>
+              {nudgeSettings.regretMinimization ? 'Enabled' : 'Enable Mode'}
+            </Text>
+          </TouchableOpacity>
+        
+          {nudgeSettings.regretMinimization && regretMinimizationSuggestions.length > 0 && (
+            <View style={styles.suggestionsContainer}>
+              <Text style={styles.suggestionsTitle}>Regret-Minimizing Next Actions:</Text>
+              {regretMinimizationSuggestions.map((task, index) => (
+                <View key={task.id} style={styles.suggestionItem}>
+                  <View style={styles.suggestionRank}>
+                    <Text style={styles.suggestionRankText}>{index + 1}</Text>
+                  </View>
+                  <View style={styles.suggestionContent}>
+                    <Text style={styles.suggestionTitle}>{task.title}</Text>
+                    <Text style={styles.suggestionMeta}>
+                      {task.estimatedMinutes}m • {(task.regretScore * 100).toFixed(0)}% regret reduction
+                    </Text>
+                  </View>
+                  <Target size={16} color="#10B981" />
                 </View>
-                <View style={styles.suggestionContent}>
-                  <Text style={styles.suggestionTitle}>{task.title}</Text>
-                  <Text style={styles.suggestionMeta}>
-                    {task.estimatedMinutes}m • {(task.regretScore * 100).toFixed(0)}% regret reduction
-                  </Text>
-                </View>
-                <Target size={16} color="#10B981" />
-              </View>
-            ))}
-          </View>
-        )}
-      </View>
-    </ScrollView>
+              ))}
+            </View>
+          )}
+        </View>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FAFAFA',
+  },
+  scrollView: {
+    flex: 1,
   },
   header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    fontWeight: '400',
+  },
+  nudgeHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    padding: 16,
+    paddingHorizontal: 20,
+    marginBottom: 16,
   },
-  headerTitle: {
-    color: '#FFFFFF',
-    fontSize: 24,
+  sectionTitle: {
+    fontSize: 20,
     fontWeight: '600',
+    color: '#1F2937',
   },
   nudgesList: {
-    paddingHorizontal: 16,
+    paddingHorizontal: 20,
+    marginBottom: 24,
   },
   nudgeCard: {
-    backgroundColor: '#1A1A1A',
+    backgroundColor: '#FFFFFF',
     padding: 16,
     borderRadius: 12,
     marginBottom: 12,
     flexDirection: 'row',
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   nudgeCardActive: {
-    borderColor: '#0EA5E9',
+    borderWidth: 2,
+    borderColor: '#10B981',
   },
   nudgeIcon: {
     width: 48,
@@ -283,14 +328,14 @@ const styles = StyleSheet.create({
   nudgeContent: {
     flex: 1,
   },
-  nudgeHeader: {
+  nudgeCardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
     marginBottom: 4,
   },
   nudgeTitle: {
-    color: '#FFFFFF',
+    color: '#1F2937',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -300,42 +345,36 @@ const styles = StyleSheet.create({
     marginBottom: 8,
   },
   consentBadge: {
-    backgroundColor: '#10B981',
-    paddingHorizontal: 8,
-    paddingVertical: 2,
-    borderRadius: 4,
-  },
-  consentBadgeText: {
-    color: '#FFFFFF',
-    fontSize: 11,
-    fontWeight: '600',
+    padding: 4,
   },
   learnMore: {
     marginTop: 4,
   },
   learnMoreText: {
-    color: '#0EA5E9',
+    color: '#6366F1',
     fontSize: 12,
+    fontWeight: '500',
   },
   somaticCard: {
-    backgroundColor: '#1A1A1A',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
-  },
-  cardTitle: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
-    marginBottom: 16,
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   somaticMetrics: {
     gap: 16,
   },
   somaticItem: {
-    marginBottom: 12,
+    marginBottom: 16,
   },
   somaticLabel: {
     color: '#6B7280',
@@ -344,27 +383,32 @@ const styles = StyleSheet.create({
   },
   rhythmBar: {
     height: 6,
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '#E5E7EB',
     borderRadius: 3,
-    marginVertical: 4,
+    marginVertical: 8,
   },
   rhythmFill: {
     height: '100%',
-    backgroundColor: '#10B981',
     borderRadius: 3,
   },
   somaticValue: {
-    color: '#FFFFFF',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   promptsCard: {
-    backgroundColor: '#1A1A1A',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   promptsList: {
     gap: 12,
@@ -372,23 +416,38 @@ const styles = StyleSheet.create({
   promptItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#F9FAFB',
     padding: 12,
     borderRadius: 8,
   },
+  promptIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginRight: 12,
+  },
   promptText: {
-    color: '#FFFFFF',
+    color: '#1F2937',
     fontSize: 14,
-    marginLeft: 12,
+    fontWeight: '500',
+    flex: 1,
   },
   regretCard: {
-    backgroundColor: '#1A1A1A',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
     marginBottom: 32,
+    padding: 20,
+    borderRadius: 16,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   regretDescription: {
     color: '#6B7280',
@@ -396,27 +455,33 @@ const styles = StyleSheet.create({
     marginBottom: 16,
   },
   regretToggle: {
-    backgroundColor: '#2A2A2A',
+    backgroundColor: '#F3F4F6',
     paddingVertical: 12,
     borderRadius: 8,
+    marginBottom: 16,
   },
   regretToggleActive: {
-    backgroundColor: '#0EA5E9',
+    backgroundColor: '#6366F1',
   },
   regretToggleText: {
-    color: '#FFFFFF',
+    color: '#6B7280',
     textAlign: 'center',
     fontWeight: '600',
+    fontSize: 16,
+  },
+  regretToggleTextActive: {
+    color: '#FFFFFF',
   },
   suggestionsContainer: {
-    marginTop: 16,
-    padding: 12,
-    backgroundColor: '#0A0A0A',
-    borderRadius: 8,
+    padding: 16,
+    backgroundColor: '#F0F9FF',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3B82F6',
   },
   suggestionsTitle: {
-    color: '#10B981',
-    fontSize: 14,
+    color: '#1F2937',
+    fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
   },
@@ -425,7 +490,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#2A2A2A',
+    borderBottomColor: '#E5E7EB',
   },
   suggestionRank: {
     width: 24,
@@ -445,13 +510,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   suggestionTitle: {
-    color: '#FFFFFF',
+    color: '#1F2937',
     fontSize: 14,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   suggestionMeta: {
     color: '#6B7280',
-    fontSize: 11,
+    fontSize: 12,
     marginTop: 2,
   },
 });

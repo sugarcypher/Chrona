@@ -1,24 +1,50 @@
 import { Tabs } from "expo-router";
 import { Activity, BarChart3, Brain, Clock, Settings } from "lucide-react-native";
 import React from "react";
+import { Platform } from "react-native";
 
 export default function TabLayout() {
   return (
     <Tabs
       screenOptions={{
-        tabBarActiveTintColor: '#0EA5E9',
-        tabBarInactiveTintColor: '#6B7280',
+        tabBarActiveTintColor: '#6366F1',
+        tabBarInactiveTintColor: '#9CA3AF',
         tabBarStyle: {
-          backgroundColor: '#111111',
-          borderTopColor: '#1F1F1F',
+          backgroundColor: '#FFFFFF',
+          borderTopColor: '#E5E7EB',
           borderTopWidth: 1,
+          height: Platform.OS === 'ios' ? 88 : 68,
+          paddingBottom: Platform.OS === 'ios' ? 28 : 8,
+          paddingTop: 8,
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: -2,
+          },
+          shadowOpacity: 0.1,
+          shadowRadius: 8,
+          elevation: 8,
+        },
+        tabBarLabelStyle: {
+          fontSize: 12,
+          fontWeight: '500',
+          marginTop: 4,
         },
         headerStyle: {
-          backgroundColor: '#0A0A0A',
+          backgroundColor: '#FFFFFF',
+          shadowColor: '#000',
+          shadowOffset: {
+            width: 0,
+            height: 1,
+          },
+          shadowOpacity: 0.05,
+          shadowRadius: 4,
+          elevation: 4,
         },
-        headerTintColor: '#FFFFFF',
+        headerTintColor: '#1F2937',
         headerTitleStyle: {
           fontWeight: '600',
+          fontSize: 18,
         },
       }}
     >
@@ -26,29 +52,29 @@ export default function TabLayout() {
       <Tabs.Screen
         name="metrology"
         options={{
-          title: "Metrology",
-          tabBarIcon: ({ color }) => <BarChart3 size={24} color={color} />,
+          title: "Analytics",
+          tabBarIcon: ({ color }) => <BarChart3 size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="flow"
         options={{
-          title: "Flow",
-          tabBarIcon: ({ color }) => <Activity size={24} color={color} />,
+          title: "Focus",
+          tabBarIcon: ({ color }) => <Activity size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="mindset"
         options={{
-          title: "Mindset",
-          tabBarIcon: ({ color }) => <Brain size={24} color={color} />,
+          title: "Wellness",
+          tabBarIcon: ({ color }) => <Brain size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="settings"
         options={{
           title: "Settings",
-          tabBarIcon: ({ color }) => <Settings size={24} color={color} />,
+          tabBarIcon: ({ color }) => <Settings size={22} color={color} />,
         }}
       />
     </Tabs>

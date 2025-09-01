@@ -155,12 +155,9 @@ export default function SettingsScreen() {
     <SafeAreaView style={styles.container}>
       <ScrollView style={styles.content} showsVerticalScrollIndicator={false}>
         <View style={styles.header}>
-          <View style={styles.headerIcon}>
-            <User size={32} color="#0EA5E9" />
-          </View>
           <Text style={styles.title}>Settings</Text>
           <Text style={styles.subtitle}>
-            Configure your Chrona experience with enterprise-grade controls
+            Configure your productivity experience
           </Text>
         </View>
         
@@ -168,10 +165,10 @@ export default function SettingsScreen() {
         
         <View style={styles.footer}>
           <Text style={styles.footerText}>
-            Chrona v1.0.0 • Time Metrology Platform
+            Chrona v1.0.0 • Productivity Platform
           </Text>
           <Text style={styles.footerSubtext}>
-            Built with transparency, consent, and antifragility
+            Built with mindfulness and transparency
           </Text>
         </View>
       </ScrollView>
@@ -182,36 +179,26 @@ export default function SettingsScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FAFAFA',
   },
   content: {
     flex: 1,
   },
   header: {
-    alignItems: 'center',
-    paddingVertical: 32,
     paddingHorizontal: 20,
-  },
-  headerIcon: {
-    width: 64,
-    height: 64,
-    borderRadius: 32,
-    backgroundColor: '#111111',
-    alignItems: 'center',
-    justifyContent: 'center',
-    marginBottom: 16,
+    paddingTop: 20,
+    paddingBottom: 32,
   },
   title: {
-    fontSize: 28,
+    fontSize: 32,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 4,
   },
   subtitle: {
     fontSize: 16,
-    color: '#9CA3AF',
-    textAlign: 'center',
-    lineHeight: 22,
+    color: '#6B7280',
+    fontWeight: '400',
   },
   section: {
     marginBottom: 32,
@@ -219,15 +206,23 @@ const styles = StyleSheet.create({
   sectionTitle: {
     fontSize: 20,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1F2937',
     marginBottom: 16,
     paddingHorizontal: 20,
   },
   sectionContent: {
-    backgroundColor: '#111111',
+    backgroundColor: '#FFFFFF',
     marginHorizontal: 20,
     borderRadius: 16,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   settingsItem: {
     flexDirection: 'row',
@@ -235,7 +230,7 @@ const styles = StyleSheet.create({
     paddingVertical: 16,
     paddingHorizontal: 20,
     borderBottomWidth: 1,
-    borderBottomColor: '#1F1F1F',
+    borderBottomColor: '#F3F4F6',
   },
   settingsItemLast: {
     borderBottomWidth: 0,
@@ -254,11 +249,11 @@ const styles = StyleSheet.create({
   settingsItemTitle: {
     fontSize: 16,
     fontWeight: '600',
-    color: '#FFFFFF',
+    color: '#1F2937',
     flex: 1,
   },
   badge: {
-    backgroundColor: '#0EA5E9',
+    backgroundColor: '#6366F1',
     paddingHorizontal: 8,
     paddingVertical: 2,
     borderRadius: 12,
@@ -271,7 +266,7 @@ const styles = StyleSheet.create({
   },
   settingsItemDescription: {
     fontSize: 14,
-    color: '#9CA3AF',
+    color: '#6B7280',
     lineHeight: 18,
   },
   footer: {
@@ -284,10 +279,11 @@ const styles = StyleSheet.create({
     fontWeight: '600',
     color: '#6B7280',
     marginBottom: 4,
+    textAlign: 'center',
   },
   footerSubtext: {
     fontSize: 14,
-    color: '#4B5563',
+    color: '#9CA3AF',
     textAlign: 'center',
   },
 });

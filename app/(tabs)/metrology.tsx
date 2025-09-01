@@ -5,10 +5,12 @@ import {
   View,
   ScrollView,
   Dimensions,
+  TouchableOpacity,
+  SafeAreaView,
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
 import { LineChart, BarChart } from 'react-native-chart-kit';
-import { Info } from 'lucide-react-native';
+import { Info, TrendingUp, Clock, Target, Zap } from 'lucide-react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
 
@@ -16,20 +18,26 @@ export default function MetrologyScreen() {
   const { timeBlocks, currentMetrics, chronoFingerprint } = useChrona();
 
   const chartConfig = {
-    backgroundGradientFrom: '#1A1A1A',
-    backgroundGradientTo: '#1A1A1A',
-    color: (opacity = 1) => `rgba(14, 165, 233, ${opacity})`,
-    strokeWidth: 2,
-    barPercentage: 0.5,
+    backgroundGradientFrom: '#FFFFFF',
+    backgroundGradientTo: '#FFFFFF',
+    color: (opacity = 1) => `rgba(99, 102, 241, ${opacity})`,
+    strokeWidth: 3,
+    barPercentage: 0.6,
     useShadowColorFromDataset: false,
     propsForLabels: {
-      fontSize: 10,
+      fontSize: 11,
       fill: '#6B7280',
+      fontWeight: '500',
     },
     propsForBackgroundLines: {
       strokeDasharray: '',
-      stroke: '#2A2A2A',
+      stroke: '#F3F4F6',
+      strokeWidth: 1,
     },
+    fillShadowGradientFrom: '#6366F1',
+    fillShadowGradientTo: '#8B5CF6',
+    fillShadowGradientFromOpacity: 0.4,
+    fillShadowGradientToOpacity: 0.1,
   };
 
   const jitterData = useMemo(() => {
@@ -48,6 +56,7 @@ export default function MetrologyScreen() {
       datasets: [{
         data: hourlyJitter,
         color: (opacity = 1) => `rgba(245, 158, 11, ${opacity})`,
+        strokeWidth: 3,
       }],
     };
   }, [timeBlocks]);
@@ -72,200 +81,349 @@ export default function MetrologyScreen() {
   }, [timeBlocks]);
 
   return (
-    <ScrollView style={styles.container} showsVerticalScrollIndicator={false}>
-      {/* Chrono-Fingerprint */}
-      <View style={styles.card}>
-        <View style={styles.cardHeader}>
-          <Text style={styles.cardTitle}>Chrono-Fingerprint</Text>
-          <Info size={16} color="#6B7280" />
+    <SafeAreaView style={styles.container}>
+      <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
+        {/* Header */}
+        <View style={styles.header}>
+          <Text style={styles.headerTitle}>Analytics</Text>
+          <Text style={styles.headerSubtitle}>Your productivity insights</Text>
         </View>
-        <Text style={styles.fingerprintText}>
-          Peak Focus: {chronoFingerprint.peakFocusHour}:00 - {chronoFingerprint.peakFocusHour + 2}:00
-        </Text>
-        <Text style={styles.fingerprintText}>
-          Stability Window: {chronoFingerprint.stabilityWindow}
-        </Text>
-        <Text style={styles.fingerprintText}>
-          Avg Resolution: {chronoFingerprint.avgResolution} min
-        </Text>
-      </View>
-
-      {/* Current Metrics */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Live Metrics</Text>
-        <View style={styles.metricsGrid}>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Resolution</Text>
-            <Text style={styles.metricValue}>{currentMetrics.resolution}m</Text>
-            <Text style={styles.metricDescription}>Smallest tracked unit</Text>
+        {/* Chrono-Fingerprint */}
+        <View style={styles.gradientCard}>
+          <View style={styles.cardHeader}>
+            <Text style={styles.gradientCardTitle}>Your Focus Profile</Text>
+            <TouchableOpacity>
+              <Info size={18} color="#FFFFFF" />
+            </TouchableOpacity>
           </View>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Jitter</Text>
-            <Text style={styles.metricValue}>{currentMetrics.jitter.toFixed(1)}m</Text>
-            <Text style={styles.metricDescription}>Timing variance</Text>
-          </View>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Drift</Text>
-            <Text style={styles.metricValue}>{currentMetrics.drift.toFixed(1)}m</Text>
-            <Text style={styles.metricDescription}>Plan deviation</Text>
-          </View>
-          <View style={styles.metricItem}>
-            <Text style={styles.metricLabel}>Latency</Text>
-            <Text style={styles.metricValue}>{currentMetrics.latency.toFixed(1)}m</Text>
-            <Text style={styles.metricDescription}>Start delay</Text>
+          <View style={styles.fingerprintGrid}>
+            <View style={styles.fingerprintItem}>
+              <Clock size={20} color="#FFFFFF" />
+              <Text style={styles.fingerprintLabel}>Peak Focus</Text>
+              <Text style={styles.fingerprintValue}>
+                {chronoFingerprint.peakFocusHour}:00 - {chronoFingerprint.peakFocusHour + 2}:00
+              </Text>
+            </View>
+            <View style={styles.fingerprintItem}>
+              <Target size={20} color="#FFFFFF" />
+              <Text style={styles.fingerprintLabel}>Stability Window</Text>
+              <Text style={styles.fingerprintValue}>{chronoFingerprint.stabilityWindow}</Text>
+            </View>
+            <View style={styles.fingerprintItem}>
+              <Zap size={20} color="#FFFFFF" />
+              <Text style={styles.fingerprintLabel}>Resolution</Text>
+              <Text style={styles.fingerprintValue}>{chronoFingerprint.avgResolution} min</Text>
+            </View>
           </View>
         </View>
-      </View>
 
-      {/* Jitter Over Time */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Hourly Jitter Pattern</Text>
-        <Text style={styles.chartDescription}>Timing variance throughout the day</Text>
-        <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-          <LineChart
-            data={jitterData}
-            width={screenWidth * 1.5}
-            height={200}
+        {/* Current Metrics */}
+        <View style={styles.metricsContainer}>
+          <Text style={styles.sectionTitle}>Live Metrics</Text>
+          <View style={styles.metricsGrid}>
+            <View style={[styles.metricCard, { backgroundColor: '#EFF6FF' }]}>
+              <View style={[styles.metricIcon, { backgroundColor: '#3B82F6' }]}>
+                <Target size={16} color="#FFFFFF" />
+              </View>
+              <Text style={styles.metricLabel}>Resolution</Text>
+              <Text style={[styles.metricValue, { color: '#3B82F6' }]}>{currentMetrics.resolution}m</Text>
+              <Text style={styles.metricDescription}>Smallest tracked unit</Text>
+            </View>
+            
+            <View style={[styles.metricCard, { backgroundColor: '#FEF3C7' }]}>
+              <View style={[styles.metricIcon, { backgroundColor: '#F59E0B' }]}>
+                <TrendingUp size={16} color="#FFFFFF" />
+              </View>
+              <Text style={styles.metricLabel}>Jitter</Text>
+              <Text style={[styles.metricValue, { color: '#F59E0B' }]}>{currentMetrics.jitter.toFixed(1)}m</Text>
+              <Text style={styles.metricDescription}>Timing variance</Text>
+            </View>
+            
+            <View style={[styles.metricCard, { backgroundColor: '#ECFDF5' }]}>
+              <View style={[styles.metricIcon, { backgroundColor: '#10B981' }]}>
+                <Clock size={16} color="#FFFFFF" />
+              </View>
+              <Text style={styles.metricLabel}>Drift</Text>
+              <Text style={[styles.metricValue, { color: '#10B981' }]}>{currentMetrics.drift.toFixed(1)}m</Text>
+              <Text style={styles.metricDescription}>Plan deviation</Text>
+            </View>
+            
+            <View style={[styles.metricCard, { backgroundColor: '#FDF2F8' }]}>
+              <View style={[styles.metricIcon, { backgroundColor: '#EC4899' }]}>
+                <Zap size={16} color="#FFFFFF" />
+              </View>
+              <Text style={styles.metricLabel}>Latency</Text>
+              <Text style={[styles.metricValue, { color: '#EC4899' }]}>{currentMetrics.latency.toFixed(1)}m</Text>
+              <Text style={styles.metricDescription}>Start delay</Text>
+            </View>
+          </View>
+        </View>
+
+        {/* Jitter Over Time */}
+        <View style={styles.chartCard}>
+          <View style={styles.chartHeader}>
+            <Text style={styles.chartTitle}>Daily Rhythm</Text>
+            <Text style={styles.chartDescription}>Timing variance throughout the day</Text>
+          </View>
+          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+            <LineChart
+              data={jitterData}
+              width={screenWidth * 1.2}
+              height={220}
+              chartConfig={chartConfig}
+              bezier
+              style={styles.chart}
+              withInnerLines={true}
+              withOuterLines={false}
+              withVerticalLabels={true}
+              withHorizontalLabels={true}
+
+            />
+          </ScrollView>
+        </View>
+
+        {/* Resolution by Day */}
+        <View style={styles.chartCard}>
+          <View style={styles.chartHeader}>
+            <Text style={styles.chartTitle}>Weekly Precision</Text>
+            <Text style={styles.chartDescription}>Minimum time units by day</Text>
+          </View>
+          <BarChart
+            data={resolutionData}
+            width={screenWidth - 48}
+            height={220}
             chartConfig={chartConfig}
-            bezier
             style={styles.chart}
             withInnerLines={true}
-            withOuterLines={false}
-            withVerticalLabels={true}
-            withHorizontalLabels={true}
+            showBarTops={false}
+            fromZero={true}
+            yAxisLabel=""
+            yAxisSuffix="m"
+
           />
-        </ScrollView>
-      </View>
+        </View>
 
-      {/* Resolution by Day */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Weekly Resolution</Text>
-        <Text style={styles.chartDescription}>Minimum time units by day</Text>
-        <BarChart
-          data={resolutionData}
-          width={screenWidth - 32}
-          height={200}
-          chartConfig={chartConfig}
-          style={styles.chart}
-          withInnerLines={true}
-          showBarTops={false}
-          fromZero={true}
-          yAxisLabel=""
-          yAxisSuffix="m"
-        />
-      </View>
-
-      {/* Drift Analysis */}
-      <View style={styles.card}>
-        <Text style={styles.cardTitle}>Drift Analysis</Text>
-        <View style={styles.driftGrid}>
-          <View style={styles.driftItem}>
-            <Text style={styles.driftLabel}>Daily Drift</Text>
-            <Text style={styles.driftValue}>+{(currentMetrics.drift * 8).toFixed(0)}m</Text>
+        {/* Drift Analysis */}
+        <View style={styles.insightCard}>
+          <Text style={styles.sectionTitle}>Schedule Insights</Text>
+          <View style={styles.driftGrid}>
+            <View style={styles.driftItem}>
+              <Text style={styles.driftLabel}>Daily Drift</Text>
+              <Text style={styles.driftValue}>+{(currentMetrics.drift * 8).toFixed(0)}m</Text>
+              <View style={styles.driftIndicator} />
+            </View>
+            <View style={styles.driftItem}>
+              <Text style={styles.driftLabel}>Weekly Trend</Text>
+              <Text style={styles.driftValue}>+{(currentMetrics.drift * 40).toFixed(0)}m</Text>
+              <View style={styles.driftIndicator} />
+            </View>
           </View>
-          <View style={styles.driftItem}>
-            <Text style={styles.driftLabel}>Weekly Slope</Text>
-            <Text style={styles.driftValue}>+{(currentMetrics.drift * 40).toFixed(0)}m</Text>
+          <View style={styles.insightBox}>
+            <Text style={styles.insightText}>
+              💡 Your schedule drifts {currentMetrics.drift > 5 ? 'significantly' : 'moderately'}. 
+              Consider {currentMetrics.drift > 5 ? 'larger entropy budgets' : 'tighter estimates'}.
+            </Text>
           </View>
         </View>
-        <Text style={styles.driftInsight}>
-          Your schedule drifts {currentMetrics.drift > 5 ? 'significantly' : 'moderately'}. 
-          Consider {currentMetrics.drift > 5 ? 'larger entropy budgets' : 'tighter estimates'}.
-        </Text>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: '#FAFAFA',
   },
-  card: {
-    backgroundColor: '#1A1A1A',
-    margin: 16,
-    padding: 16,
-    borderRadius: 12,
-    borderWidth: 1,
-    borderColor: '#2A2A2A',
+  scrollView: {
+    flex: 1,
+  },
+  header: {
+    paddingHorizontal: 20,
+    paddingTop: 20,
+    paddingBottom: 16,
+  },
+  headerTitle: {
+    fontSize: 32,
+    fontWeight: '700',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#6B7280',
+    fontWeight: '400',
+  },
+  gradientCard: {
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 16,
+    padding: 20,
+    backgroundColor: '#6366F1',
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: 20,
   },
-  cardTitle: {
+  gradientCardTitle: {
     color: '#FFFFFF',
-    fontSize: 18,
+    fontSize: 20,
     fontWeight: '600',
-    marginBottom: 8,
   },
-  chartDescription: {
-    color: '#6B7280',
+  fingerprintGrid: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+  },
+  fingerprintItem: {
+    alignItems: 'center',
+    flex: 1,
+  },
+  fingerprintLabel: {
+    color: 'rgba(255,255,255,0.8)',
     fontSize: 12,
-    marginBottom: 12,
+    fontWeight: '500',
+    marginTop: 8,
+    marginBottom: 4,
   },
-  chart: {
-    marginVertical: 8,
-    borderRadius: 8,
+  fingerprintValue: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  sectionTitle: {
+    fontSize: 20,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 16,
+  },
+  metricsContainer: {
+    paddingHorizontal: 20,
+    marginBottom: 24,
   },
   metricsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: 8,
+    gap: 12,
   },
-  metricItem: {
-    width: '50%',
-    padding: 12,
+  metricCard: {
+    width: (screenWidth - 56) / 2,
+    padding: 16,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  metricIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 8,
   },
   metricLabel: {
-    color: '#6B7280',
     fontSize: 12,
+    fontWeight: '500',
+    color: '#6B7280',
     marginBottom: 4,
   },
   metricValue: {
-    color: '#0EA5E9',
     fontSize: 24,
-    fontWeight: '600',
+    fontWeight: '700',
     marginBottom: 4,
   },
   metricDescription: {
-    color: '#4B5563',
-    fontSize: 10,
+    fontSize: 11,
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
-  fingerprintText: {
-    color: '#FFFFFF',
+  chartCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginBottom: 20,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  chartHeader: {
+    marginBottom: 16,
+  },
+  chartTitle: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#1F2937',
+    marginBottom: 4,
+  },
+  chartDescription: {
     fontSize: 14,
-    marginBottom: 8,
+    color: '#6B7280',
+  },
+  chart: {
+    borderRadius: 12,
+  },
+  insightCard: {
+    backgroundColor: '#FFFFFF',
+    marginHorizontal: 20,
+    marginBottom: 32,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
   },
   driftGrid: {
     flexDirection: 'row',
-    marginTop: 8,
+    gap: 16,
+    marginBottom: 16,
   },
   driftItem: {
     flex: 1,
     alignItems: 'center',
-    padding: 12,
-    backgroundColor: '#0A0A0A',
-    borderRadius: 8,
-    marginHorizontal: 4,
+    padding: 16,
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
   },
   driftLabel: {
-    color: '#6B7280',
     fontSize: 12,
+    fontWeight: '500',
+    color: '#6B7280',
     marginBottom: 4,
   },
   driftValue: {
-    color: '#F59E0B',
     fontSize: 20,
-    fontWeight: '600',
+    fontWeight: '700',
+    color: '#F59E0B',
+    marginBottom: 8,
   },
-  driftInsight: {
-    color: '#6B7280',
-    fontSize: 12,
-    marginTop: 12,
-    fontStyle: 'italic',
+  driftIndicator: {
+    width: 24,
+    height: 3,
+    backgroundColor: '#F59E0B',
+    borderRadius: 2,
+  },
+  insightBox: {
+    backgroundColor: '#F0F9FF',
+    padding: 16,
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: '#3B82F6',
+  },
+  insightText: {
+    fontSize: 14,
+    color: '#1F2937',
+    lineHeight: 20,
   },
 });
