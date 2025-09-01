@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   Animated,
   SafeAreaView,
+  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -88,11 +89,33 @@ export default function SplashScreen() {
   const renderWelcome = () => (
     <View style={styles.stepContainer}>
       <View style={styles.logoContainer}>
-        <View style={styles.logoPlaceholder}>
-          <Text style={styles.logoEmoji}>⏱️</Text>
-        </View>
-        <Text style={styles.logoText}>Chrona</Text>
-        <Text style={styles.tagline}>Time Metrology for Human Flourishing</Text>
+        <Animated.View style={[
+          styles.logoWrapper,
+          {
+            transform: [{ scale: fadeAnim }],
+            opacity: fadeAnim,
+          }
+        ]}>
+          <Image 
+            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/y8lebfiecrp8dglf2nfqt' }}
+            style={styles.logo}
+            resizeMode="contain"
+          />
+        </Animated.View>
+        <Animated.Text style={[
+          styles.logoText,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }
+        ]}>Chrona</Animated.Text>
+        <Animated.Text style={[
+          styles.tagline,
+          {
+            opacity: fadeAnim,
+            transform: [{ translateY: slideAnim }],
+          }
+        ]}>Time Metrology for Human Flourishing</Animated.Text>
       </View>
       
       <View style={styles.descriptionContainer}>
@@ -251,31 +274,41 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 60,
   },
-  logoPlaceholder: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#1A1A1A',
+  logoWrapper: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
     justifyContent: 'center',
     alignItems: 'center',
     borderWidth: 2,
-    borderColor: '#0EA5E9',
+    borderColor: 'rgba(14, 165, 233, 0.3)',
+    shadowColor: '#0EA5E9',
+    shadowOffset: { width: 0, height: 0 },
+    shadowOpacity: 0.3,
+    shadowRadius: 20,
+    elevation: 10,
   },
-  logoEmoji: {
-    fontSize: 40,
+  logo: {
+    width: 80,
+    height: 80,
   },
   logoText: {
     fontSize: 48,
     fontWeight: '700',
     color: '#FFFFFF',
-    marginTop: 16,
+    marginTop: 24,
     letterSpacing: -1,
+    textShadowColor: 'rgba(14, 165, 233, 0.5)',
+    textShadowOffset: { width: 0, height: 0 },
+    textShadowRadius: 10,
   },
   tagline: {
     fontSize: 16,
     color: '#9CA3AF',
     marginTop: 8,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   descriptionContainer: {
     flex: 1,

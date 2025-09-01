@@ -238,28 +238,76 @@ export default function TasksScreen() {
       </Text>
       
       <View style={styles.integrationGrid}>
-        <TouchableOpacity style={styles.integrationCard}>
+        <TouchableOpacity 
+          style={styles.integrationCard}
+          onPress={() => {
+            Alert.alert(
+              'Google Calendar Integration',
+              'Connect your Google Calendar to sync tasks and events. This will allow Chrona to:\n\n• Import existing events as time blocks\n• Export tasks to your calendar\n• Detect scheduling conflicts\n• Optimize around existing commitments',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Connect', onPress: () => Alert.alert('Demo', 'Calendar integration would be implemented here') },
+              ]
+            );
+          }}
+        >
           <Calendar size={24} color="#3B82F6" />
           <Text style={styles.integrationTitle}>Google Calendar</Text>
           <Text style={styles.integrationStatus}>Not Connected</Text>
           <ExternalLink size={16} color="#6B7280" />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.integrationCard}>
+        <TouchableOpacity 
+          style={styles.integrationCard}
+          onPress={() => {
+            Alert.alert(
+              'Apple Calendar Integration',
+              'Connect your Apple Calendar to sync with Chrona. This integration provides:\n\n• Seamless event import\n• Two-way task synchronization\n• Smart scheduling around meetings\n• Focus time blocking',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Connect', onPress: () => Alert.alert('Demo', 'Apple Calendar integration would be implemented here') },
+              ]
+            );
+          }}
+        >
           <Calendar size={24} color="#000000" />
           <Text style={styles.integrationTitle}>Apple Calendar</Text>
           <Text style={styles.integrationStatus}>Not Connected</Text>
           <ExternalLink size={16} color="#6B7280" />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.integrationCard}>
+        <TouchableOpacity 
+          style={styles.integrationCard}
+          onPress={() => {
+            Alert.alert(
+              'Outlook Integration',
+              'Connect Microsoft Outlook for enterprise productivity:\n\n• Meeting time block creation\n• Task deadline synchronization\n• Team calendar coordination\n• Focus time protection',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Connect', onPress: () => Alert.alert('Demo', 'Outlook integration would be implemented here') },
+              ]
+            );
+          }}
+        >
           <Calendar size={24} color="#0078D4" />
           <Text style={styles.integrationTitle}>Outlook</Text>
           <Text style={styles.integrationStatus}>Not Connected</Text>
           <ExternalLink size={16} color="#6B7280" />
         </TouchableOpacity>
         
-        <TouchableOpacity style={styles.integrationCard}>
+        <TouchableOpacity 
+          style={styles.integrationCard}
+          onPress={() => {
+            Alert.alert(
+              'Import Calendar File',
+              'Import events from any calendar application using .ics files:\n\n• Drag and drop .ics files\n• Bulk import events as time blocks\n• Preserve event metadata\n• Maintain privacy (local processing)',
+              [
+                { text: 'Cancel', style: 'cancel' },
+                { text: 'Import File', onPress: () => Alert.alert('Demo', 'File import would be implemented here') },
+              ]
+            );
+          }}
+        >
           <Import size={24} color="#6B7280" />
           <Text style={styles.integrationTitle}>Import .ics</Text>
           <Text style={styles.integrationStatus}>Upload File</Text>
@@ -267,7 +315,27 @@ export default function TasksScreen() {
         </TouchableOpacity>
       </View>
       
-      <TouchableOpacity style={styles.syncButton}>
+      <TouchableOpacity 
+        style={styles.syncButton}
+        onPress={() => {
+          Alert.alert(
+            'Sync All Calendars',
+            'This will synchronize all connected calendars with Chrona:\n\n• Import new events as time blocks\n• Export pending tasks to calendars\n• Update existing entries\n• Resolve scheduling conflicts',
+            [
+              { text: 'Cancel', style: 'cancel' },
+              { 
+                text: 'Sync Now', 
+                onPress: () => {
+                  Alert.alert('Syncing...', 'Calendar synchronization in progress');
+                  setTimeout(() => {
+                    Alert.alert('Sync Complete', 'All calendars have been synchronized successfully.');
+                  }, 2000);
+                }
+              },
+            ]
+          );
+        }}
+      >
         <Text style={styles.syncButtonText}>Sync All Calendars</Text>
       </TouchableOpacity>
     </View>

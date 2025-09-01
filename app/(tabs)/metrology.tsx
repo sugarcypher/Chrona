@@ -10,6 +10,7 @@ import {
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
 import { LineChart, BarChart } from 'react-native-chart-kit';
+import { Platform } from 'react-native';
 import { Info, TrendingUp, Clock, Target, Zap } from 'lucide-react-native';
 
 const { width: screenWidth } = Dimensions.get('window');
@@ -165,21 +166,27 @@ export default function MetrologyScreen() {
             <Text style={styles.chartTitle}>Daily Rhythm</Text>
             <Text style={styles.chartDescription}>Timing variance throughout the day</Text>
           </View>
-          <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-            <LineChart
-              data={jitterData}
-              width={screenWidth * 1.2}
-              height={220}
-              chartConfig={chartConfig}
-              bezier
-              style={styles.chart}
-              withInnerLines={true}
-              withOuterLines={false}
-              withVerticalLabels={true}
-              withHorizontalLabels={true}
-
-            />
-          </ScrollView>
+          {Platform.OS !== 'web' ? (
+            <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+              <LineChart
+                data={jitterData}
+                width={screenWidth * 1.2}
+                height={220}
+                chartConfig={chartConfig}
+                bezier
+                style={styles.chart}
+                withInnerLines={true}
+                withOuterLines={false}
+                withVerticalLabels={true}
+                withHorizontalLabels={true}
+              />
+            </ScrollView>
+          ) : (
+            <View style={styles.webChartPlaceholder}>
+              <Text style={styles.webChartText}>📊 Chart visualization available on mobile</Text>
+              <Text style={styles.webChartSubtext}>Interactive charts work best in the native app</Text>
+            </View>
+          )}
         </View>
 
         {/* Resolution by Day */}
@@ -188,19 +195,25 @@ export default function MetrologyScreen() {
             <Text style={styles.chartTitle}>Weekly Precision</Text>
             <Text style={styles.chartDescription}>Minimum time units by day</Text>
           </View>
-          <BarChart
-            data={resolutionData}
-            width={screenWidth - 48}
-            height={220}
-            chartConfig={chartConfig}
-            style={styles.chart}
-            withInnerLines={true}
-            showBarTops={false}
-            fromZero={true}
-            yAxisLabel=""
-            yAxisSuffix="m"
-
-          />
+          {Platform.OS !== 'web' ? (
+            <BarChart
+              data={resolutionData}
+              width={screenWidth - 48}
+              height={220}
+              chartConfig={chartConfig}
+              style={styles.chart}
+              withInnerLines={true}
+              showBarTops={false}
+              fromZero={true}
+              yAxisLabel=""
+              yAxisSuffix="m"
+            />
+          ) : (
+            <View style={styles.webChartPlaceholder}>
+              <Text style={styles.webChartText}>📊 Chart visualization available on mobile</Text>
+              <Text style={styles.webChartSubtext}>Weekly precision metrics work best in the native app</Text>
+            </View>
+          )}
         </View>
 
         {/* Drift Analysis */}
@@ -425,5 +438,26 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#1F2937',
     lineHeight: 20,
+  },
+  webChartPlaceholder: {
+    height: 220,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#F9FAFB',
+    borderRadius: 12,
+    borderWidth: 2,
+    borderColor: '#E5E7EB',
+    borderStyle: 'dashed',
+  },
+  webChartText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: '#6B7280',
+    marginBottom: 8,
+  },
+  webChartSubtext: {
+    fontSize: 14,
+    color: '#9CA3AF',
+    textAlign: 'center',
   },
 });
