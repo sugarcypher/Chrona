@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import {
   View,
   Text,
@@ -7,12 +7,28 @@ import {
   TouchableOpacity,
   Animated,
   SafeAreaView,
-  Image,
-
+  Dimensions,
+  Platform,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Shield, Eye, Lock, CheckCircle, ArrowRight, Clock, Target, Zap, BarChart3 } from 'lucide-react-native';
+import { 
+  Shield, 
+  Eye, 
+  Lock, 
+  CheckCircle, 
+  ArrowRight, 
+  Clock, 
+  Target, 
+  Zap, 
+  BarChart3,
+  Sparkles,
+  Timer,
+  Brain,
+  TrendingUp
+} from 'lucide-react-native';
+import { LinearGradient } from 'expo-linear-gradient';
+import { Colors, Typography, Spacing, BorderRadius, Shadows } from '@/constants/design';
 
 
 
@@ -23,9 +39,13 @@ interface ConsentState {
   liabilityAcknowledged: boolean;
 }
 
+const { width, height } = Dimensions.get('window');
+
 export default function SplashScreen() {
   const [fadeAnim] = useState(new Animated.Value(0));
   const [slideAnim] = useState(new Animated.Value(50));
+  const [scaleAnim] = useState(new Animated.Value(0.8));
+  const [rotateAnim] = useState(new Animated.Value(0));
   const [currentStep, setCurrentStep] = useState(0);
   const [onboardingStep, setOnboardingStep] = useState(0);
   const [consent, setConsent] = useState<ConsentState>({
@@ -34,23 +54,87 @@ export default function SplashScreen() {
     cooperativeResearch: false,
     liabilityAcknowledged: false,
   });
+  
+  const particleAnims = useRef(Array.from({ length: 12 }, () => ({
+    x: new Animated.Value(Math.random() * width),
+    y: new Animated.Value(Math.random() * height),
+    opacity: new Animated.Value(Math.random() * 0.6 + 0.2),
+    scale: new Animated.Value(Math.random() * 0.5 + 0.5),
+  }))).current;
 
   useEffect(() => {
     checkFirstLaunch();
     
+    // Main entrance animation
     Animated.parallel([
       Animated.timing(fadeAnim, {
         toValue: 1,
-        duration: 1000,
+        duration: 1200,
         useNativeDriver: true,
       }),
       Animated.timing(slideAnim, {
         toValue: 0,
-        duration: 800,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.spring(scaleAnim, {
+        toValue: 1,
+        tension: 50,
+        friction: 8,
         useNativeDriver: true,
       }),
     ]).start();
-  }, [fadeAnim, slideAnim]);
+    
+    // Continuous rotation animation
+    const rotateAnimation = Animated.loop(
+      Animated.timing(rotateAnim, {
+        toValue: 1,
+        duration: 20000,
+        useNativeDriver: true,
+      })
+    );
+    rotateAnimation.start();
+    
+    // Floating particles animation
+    const animateParticles = () => {
+      particleAnims.forEach((particle, index) => {
+        const animateParticle = () => {
+          Animated.parallel([
+            Animated.timing(particle.y, {
+              toValue: -100,
+              duration: 8000 + Math.random() * 4000,
+              useNativeDriver: true,
+            }),
+            Animated.sequence([
+              Animated.timing(particle.opacity, {
+                toValue: 0.8,
+                duration: 2000,
+                useNativeDriver: true,
+              }),
+              Animated.timing(particle.opacity, {
+                toValue: 0,
+                duration: 6000,
+                useNativeDriver: true,
+              }),
+            ]),
+          ]).start(() => {
+            particle.y.setValue(height + 100);
+            particle.x.setValue(Math.random() * width);
+            particle.opacity.setValue(Math.random() * 0.6 + 0.2);
+            animateParticle();
+          });
+        };
+        
+        setTimeout(() => animateParticle(), index * 1000);
+      });
+    };
+    
+    animateParticles();
+    
+    return () => {
+      rotateAnimation.stop();
+    };
+  }, [fadeAnim, slideAnim, scaleAnim, rotateAnim]);
 
   const checkFirstLaunch = async () => {
     try {
@@ -134,11 +218,11 @@ export default function SplashScreen() {
         </View>
         
         <View style={styles.onboardingContent}>
-          <View style={styles.featureCard}>
+          <View style={styles.onboardingFeatureCard}>
             <View style={styles.featureIcon}>
               <IconComponent size={28} color="#0EA5E9" />
             </View>
-            <Text style={styles.featureTitle}>{currentOnboardingStep.title}</Text>
+            <Text style={styles.onboardingFeatureTitle}>{currentOnboardingStep.title}</Text>
             <Text style={styles.featureDescription}>{currentOnboardingStep.description}</Text>
           </View>
         </View>
@@ -185,70 +269,155 @@ export default function SplashScreen() {
     );
   };
 
+  const renderParticles = () => (
+    <View style={styles.particleContainer}>
+      {particleAnims.map((particle, index) => (
+        <Animated.View
+          key={index}
+          style={[
+            styles.particle,
+            {
+              transform: [
+                { translateX: particle.x },
+                { translateY: particle.y },
+                { scale: particle.scale },
+              ],
+              opacity: particle.opacity,
+            },
+          ]}
+        >
+          <Sparkles size={4} color={Colors.accent[400]} />
+        </Animated.View>
+      ))}
+    </View>
+  );
+
   const renderWelcome = () => (
     <View style={styles.stepContainer}>
+      {renderParticles()}
+      
+      <LinearGradient
+        colors={['rgba(168, 85, 247, 0.1)', 'rgba(124, 58, 237, 0.05)', 'transparent']}
+        style={styles.gradientOverlay}
+        start={{ x: 0, y: 0 }}
+        end={{ x: 1, y: 1 }}
+      />
+      
       <View style={styles.logoContainer}>
         <Animated.View style={[
           styles.logoWrapper,
           {
-            transform: [{ scale: fadeAnim }],
+            transform: [
+              { scale: scaleAnim },
+              { 
+                rotate: rotateAnim.interpolate({
+                  inputRange: [0, 1],
+                  outputRange: ['0deg', '360deg'],
+                })
+              }
+            ],
             opacity: fadeAnim,
           }
         ]}>
-          <Image 
-            source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/y8lebfiecrp8dglf2nfqt' }}
-            style={styles.logo}
-            resizeMode="contain"
-          />
+          <LinearGradient
+            colors={[Colors.accent[500], Colors.accent[700]]}
+            style={styles.logoGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
+          >
+            <Timer size={48} color={Colors.background.primary} strokeWidth={1.5} />
+          </LinearGradient>
+          
+          <View style={styles.logoRing} />
+          <View style={[styles.logoRing, styles.logoRingOuter]} />
         </Animated.View>
-        <Animated.Text style={[
-          styles.logoText,
+        
+        <Animated.View style={[
+          styles.brandContainer,
           {
             opacity: fadeAnim,
             transform: [{ translateY: slideAnim }],
           }
         ]}>
-          <Text>Chrona</Text>
-        </Animated.Text>
-        <Animated.Text style={[
-          styles.tagline,
-          {
-            opacity: fadeAnim,
-            transform: [{ translateY: slideAnim }],
-          }
-        ]}>
-          <Text>Time Metrology for Human Flourishing</Text>
-        </Animated.Text>
+          <Text style={styles.logoText}>Chrona</Text>
+          <View style={styles.taglineContainer}>
+            <Text style={styles.tagline}>Time Metrology for Human Flourishing</Text>
+            <View style={styles.taglineUnderline} />
+          </View>
+        </Animated.View>
       </View>
       
-      <View style={styles.descriptionContainer}>
+      <Animated.View style={[
+        styles.descriptionContainer,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }
+      ]}>
         <Text style={styles.description}>
-          Welcome to Chrona — the first time metrology platform that measures, explains, and optimizes your lived experience of time.
+          The first enterprise-grade platform for measuring, understanding, and optimizing your temporal experience with scientific precision.
         </Text>
         
-        <View style={styles.featureList}>
-          <View style={styles.feature}>
-            <Shield size={20} color="#10B981" />
-            <Text style={styles.featureText}>Enterprise-grade privacy</Text>
+        <View style={styles.featureGrid}>
+          <View style={styles.featureCard}>
+            <View style={styles.featureIconContainer}>
+              <Shield size={24} color={Colors.success[500]} strokeWidth={1.5} />
+            </View>
+            <Text style={styles.featureTitle}>Enterprise Security</Text>
+            <Text style={styles.featureSubtitle}>Bank-grade encryption</Text>
           </View>
-          <View style={styles.feature}>
-            <Eye size={20} color="#10B981" />
-            <Text style={styles.featureText}>Transparent algorithms</Text>
+          
+          <View style={styles.featureCard}>
+            <View style={styles.featureIconContainer}>
+              <Brain size={24} color={Colors.info[500]} strokeWidth={1.5} />
+            </View>
+            <Text style={styles.featureTitle}>AI-Powered Insights</Text>
+            <Text style={styles.featureSubtitle}>Predictive analytics</Text>
           </View>
-          <View style={styles.feature}>
-            <Lock size={20} color="#10B981" />
-            <Text style={styles.featureText}>Local-first data</Text>
+          
+          <View style={styles.featureCard}>
+            <View style={styles.featureIconContainer}>
+              <TrendingUp size={24} color={Colors.accent[500]} strokeWidth={1.5} />
+            </View>
+            <Text style={styles.featureTitle}>Performance Optimization</Text>
+            <Text style={styles.featureSubtitle}>Measurable results</Text>
+          </View>
+          
+          <View style={styles.featureCard}>
+            <View style={styles.featureIconContainer}>
+              <Lock size={24} color={Colors.warning[500]} strokeWidth={1.5} />
+            </View>
+            <Text style={styles.featureTitle}>Privacy First</Text>
+            <Text style={styles.featureSubtitle}>Local-only processing</Text>
           </View>
         </View>
-      </View>
+      </Animated.View>
       
-      <TouchableOpacity 
-        style={styles.nextButton} 
-        onPress={() => setCurrentStep(1)}
-      >
-        <Text style={styles.nextButtonText}>Begin Setup</Text>
-        <ArrowRight size={20} color="#FFFFFF" />
-      </TouchableOpacity>
+      <Animated.View style={[
+        styles.ctaContainer,
+        {
+          opacity: fadeAnim,
+          transform: [{ translateY: slideAnim }],
+        }
+      ]}>
+        <TouchableOpacity 
+          style={styles.primaryButton} 
+          onPress={() => setCurrentStep(1)}
+          activeOpacity={0.8}
+        >
+          <LinearGradient
+            colors={[Colors.accent[500], Colors.accent[700]]}
+            style={styles.buttonGradient}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <Text style={styles.primaryButtonText}>Begin Enterprise Setup</Text>
+            <ArrowRight size={20} color={Colors.background.primary} strokeWidth={2} />
+          </LinearGradient>
+        </TouchableOpacity>
+        
+        <Text style={styles.versionText}>Version 1.0.0 • Enterprise Edition</Text>
+      </Animated.View>
     </View>
   );
 
@@ -364,96 +533,181 @@ export default function SplashScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
+    backgroundColor: Colors.primary[900],
   },
   content: {
     flex: 1,
-    paddingHorizontal: 24,
+    paddingHorizontal: Spacing['2xl'],
   },
   stepContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingVertical: 40,
+    paddingVertical: Spacing['5xl'],
+  },
+  particleContainer: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 0,
+  },
+  particle: {
+    position: 'absolute',
+    zIndex: 1,
+  },
+  gradientOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    zIndex: 1,
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: 60,
+    marginTop: Spacing['6xl'],
+    zIndex: 2,
   },
   logoWrapper: {
+    width: 140,
+    height: 140,
+    justifyContent: 'center',
+    alignItems: 'center',
+    position: 'relative',
+  },
+  logoGradient: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    justifyContent: 'center',
+    alignItems: 'center',
+    ...Shadows.glass,
+  },
+  logoRing: {
+    position: 'absolute',
     width: 120,
     height: 120,
     borderRadius: 60,
-    backgroundColor: 'rgba(14, 165, 233, 0.1)',
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: 'rgba(14, 165, 233, 0.3)',
-    shadowColor: '#0EA5E9',
-    shadowOffset: { width: 0, height: 0 },
-    shadowOpacity: 0.3,
-    shadowRadius: 20,
-    elevation: 10,
+    borderWidth: 1,
+    borderColor: `${Colors.accent[400]}40`,
   },
-  logo: {
-    width: 80,
-    height: 80,
+  logoRingOuter: {
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    borderColor: `${Colors.accent[300]}20`,
+  },
+  brandContainer: {
+    alignItems: 'center',
+    marginTop: Spacing['3xl'],
   },
   logoText: {
-    fontSize: 48,
-    fontWeight: '700',
-    color: '#FFFFFF',
-    marginTop: 24,
-    letterSpacing: -1,
-    textShadowColor: 'rgba(14, 165, 233, 0.5)',
-    textShadowOffset: { width: 0, height: 0 },
-    textShadowRadius: 10,
+    fontSize: Typography.fontSize['5xl'],
+    fontWeight: Typography.fontWeight.extrabold,
+    color: Colors.text.inverse,
+    letterSpacing: Typography.letterSpacing.tight,
+    textShadowColor: `${Colors.accent[500]}60`,
+    textShadowOffset: { width: 0, height: 4 },
+    textShadowRadius: 12,
+  },
+  taglineContainer: {
+    alignItems: 'center',
+    marginTop: Spacing.md,
   },
   tagline: {
-    fontSize: 16,
-    color: '#9CA3AF',
-    marginTop: 8,
+    fontSize: Typography.fontSize.lg,
+    color: Colors.primary[300],
     textAlign: 'center',
-    letterSpacing: 0.5,
+    letterSpacing: Typography.letterSpacing.wide,
+    fontWeight: Typography.fontWeight.medium,
+  },
+  taglineUnderline: {
+    width: 60,
+    height: 2,
+    backgroundColor: Colors.accent[500],
+    marginTop: Spacing.sm,
+    borderRadius: 1,
   },
   descriptionContainer: {
     flex: 1,
     justifyContent: 'center',
-    paddingVertical: 40,
+    paddingVertical: Spacing['5xl'],
+    zIndex: 2,
   },
   description: {
-    fontSize: 18,
-    color: '#E5E7EB',
-    lineHeight: 26,
+    fontSize: Typography.fontSize.xl,
+    color: Colors.primary[200],
+    lineHeight: Typography.lineHeight.relaxed * Typography.fontSize.xl,
     textAlign: 'center',
-    marginBottom: 40,
+    marginBottom: Spacing['5xl'],
+    fontWeight: Typography.fontWeight.medium,
   },
-  featureList: {
-    gap: 16,
-  },
-  feature: {
+  featureGrid: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+    gap: Spacing.lg,
+  },
+  featureCard: {
+    width: (width - Spacing['2xl'] * 2 - Spacing.lg) / 2,
+    backgroundColor: `${Colors.background.primary}08`,
+    borderRadius: BorderRadius.xl,
+    padding: Spacing.xl,
     alignItems: 'center',
-    gap: 12,
-    paddingVertical: 8,
+    borderWidth: 1,
+    borderColor: `${Colors.accent[400]}20`,
+    ...Shadows.sm,
   },
-  featureText: {
-    fontSize: 16,
-    color: '#D1D5DB',
+  featureIconContainer: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: `${Colors.background.primary}15`,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: Spacing.md,
   },
-  nextButton: {
-    backgroundColor: '#0EA5E9',
+  featureTitle: {
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.semibold,
+    color: Colors.text.inverse,
+    textAlign: 'center',
+    marginBottom: Spacing.xs,
+  },
+  featureSubtitle: {
+    fontSize: Typography.fontSize.xs,
+    color: Colors.primary[400],
+    textAlign: 'center',
+  },
+  ctaContainer: {
+    alignItems: 'center',
+    zIndex: 2,
+  },
+  primaryButton: {
+    borderRadius: BorderRadius.xl,
+    overflow: 'hidden',
+    ...Shadows.lg,
+  },
+  buttonGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 24,
-    borderRadius: 12,
-    gap: 8,
+    paddingVertical: Spacing.xl,
+    paddingHorizontal: Spacing['3xl'],
+    gap: Spacing.md,
   },
-  nextButtonText: {
-    color: '#FFFFFF',
-    fontSize: 18,
-    fontWeight: '600',
+  primaryButtonText: {
+    color: Colors.background.primary,
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.bold,
+    letterSpacing: Typography.letterSpacing.wide,
+  },
+  versionText: {
+    fontSize: Typography.fontSize.sm,
+    color: Colors.primary[500],
+    marginTop: Spacing.xl,
+    fontWeight: Typography.fontWeight.medium,
   },
   stepTitle: {
     fontSize: 28,
@@ -564,7 +818,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: 20,
   },
-  featureCard: {
+  onboardingFeatureCard: {
     backgroundColor: '#111111',
     borderRadius: 20,
     padding: 24,
@@ -583,7 +837,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
     borderColor: 'rgba(14, 165, 233, 0.2)',
   },
-  featureTitle: {
+  onboardingFeatureTitle: {
     fontSize: 20,
     fontWeight: '700',
     color: '#FFFFFF',
