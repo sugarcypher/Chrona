@@ -2,10 +2,12 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import React, { useEffect, useState } from "react";
+import { View } from "react-native";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ChronaProvider } from "@/providers/ChronaProvider";
 import { StatusBar } from "expo-status-bar";
+import GlyphHeader from '@/components/ui/GlyphHeader';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -43,14 +45,24 @@ function RootLayoutNav() {
         name="nudge-ledger" 
         options={{ 
           title: "Nudge Ledger",
-          presentation: "modal"
+          presentation: "modal",
+          headerTitle: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <GlyphHeader />
+            </View>
+          ),
         }} 
       />
       <Stack.Screen 
         name="task-detail" 
         options={{ 
           title: "Task Configuration",
-          presentation: "modal"
+          presentation: "modal",
+          headerTitle: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <GlyphHeader />
+            </View>
+          ),
         }} 
       />
       <Stack.Screen 
@@ -64,28 +76,48 @@ function RootLayoutNav() {
         name="privacy-dashboard" 
         options={{ 
           title: "Privacy Dashboard",
-          presentation: "modal"
+          presentation: "modal",
+          headerTitle: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <GlyphHeader />
+            </View>
+          ),
         }} 
       />
       <Stack.Screen 
         name="security-settings" 
         options={{ 
           title: "Security Settings",
-          presentation: "modal"
+          presentation: "modal",
+          headerTitle: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <GlyphHeader />
+            </View>
+          ),
         }} 
       />
       <Stack.Screen 
         name="calendar-view" 
         options={{ 
           title: "Calendar View",
-          presentation: "modal"
+          presentation: "modal",
+          headerTitle: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <GlyphHeader />
+            </View>
+          ),
         }} 
       />
       <Stack.Screen 
         name="itinerary-planner" 
         options={{ 
           title: "Itinerary Planner",
-          presentation: "modal"
+          presentation: "modal",
+          headerTitle: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <GlyphHeader />
+            </View>
+          ),
         }} 
       />
     </Stack>

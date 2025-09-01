@@ -1,7 +1,8 @@
 import { Tabs } from "expo-router";
 import { Activity, BarChart3, Brain, Clock, Settings, Calendar } from "lucide-react-native";
 import React from "react";
-import { Platform } from "react-native";
+import { Platform, View } from "react-native";
+import GlyphHeader from '@/components/ui/GlyphHeader';
 
 export default function TabLayout() {
   return (
@@ -51,6 +52,11 @@ export default function TabLayout() {
           color: '#1C1917',
         },
         headerShadowVisible: false,
+        headerTitle: () => (
+          <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+            <GlyphHeader />
+          </View>
+        ),
       }}
     >
 
