@@ -6,15 +6,13 @@ import {
   ScrollView,
   TouchableOpacity,
   Animated,
-  Dimensions,
   SafeAreaView,
-  Image,
 } from 'react-native';
 import { router } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Shield, Eye, Lock, CheckCircle, ArrowRight } from 'lucide-react-native';
 
-const { width, height } = Dimensions.get('window');
+
 
 interface ConsentState {
   dataProcessing: boolean;
@@ -49,13 +47,13 @@ export default function SplashScreen() {
         useNativeDriver: true,
       }),
     ]).start();
-  }, []);
+  }, [fadeAnim, slideAnim]);
 
   const checkFirstLaunch = async () => {
     try {
       const hasLaunched = await AsyncStorage.getItem('chrona_has_launched');
       if (hasLaunched) {
-        router.replace('/(tabs)/metrology');
+        router.replace('/(tabs)/tasks');
       }
     } catch (error) {
       console.error('Error checking first launch:', error);
@@ -81,7 +79,7 @@ export default function SplashScreen() {
         version: '1.0.0',
       }));
       
-      router.replace('/(tabs)/metrology');
+      router.replace('/(tabs)/tasks');
     } catch (error) {
       console.error('Error saving consent:', error);
     }
@@ -90,11 +88,9 @@ export default function SplashScreen() {
   const renderWelcome = () => (
     <View style={styles.stepContainer}>
       <View style={styles.logoContainer}>
-        <Image 
-          source={{ uri: 'https://pub-e001eb4506b145aa938b5d3badbff6a5.r2.dev/attachments/pccgpiz7zxqjefsgmiwkd' }}
-          style={styles.logoImage}
-          resizeMode="contain"
-        />
+        <View style={styles.logoPlaceholder}>
+          <Text style={styles.logoEmoji}>⏱️</Text>
+        </View>
         <Text style={styles.logoText}>Chrona</Text>
         <Text style={styles.tagline}>Time Metrology for Human Flourishing</Text>
       </View>
@@ -255,9 +251,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginTop: 60,
   },
-  logoImage: {
+  logoPlaceholder: {
     width: 80,
     height: 80,
+    borderRadius: 40,
+    backgroundColor: '#1A1A1A',
+    justifyContent: 'center',
+    alignItems: 'center',
+    borderWidth: 2,
+    borderColor: '#0EA5E9',
+  },
+  logoEmoji: {
+    fontSize: 40,
   },
   logoText: {
     fontSize: 48,

@@ -10,7 +10,8 @@ import {
   SafeAreaView,
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
-import { TrendingUp, Zap, Target, Brain, Activity, Keyboard, Mouse, Play, Pause, RotateCcw } from 'lucide-react-native';
+import { TrendingUp, Zap, Target, Brain, Activity, Keyboard, Mouse, Play, Pause, RotateCcw, Album } from 'lucide-react-native';
+import { Alert as AlertDialog } from 'react-native';
 
 export default function FlowScreen() {
   const { flowState, activeTask, updateFlowState, settings } = useChrona();
@@ -99,13 +100,40 @@ export default function FlowScreen() {
           
           {/* Flow Controls */}
           <View style={styles.flowControls}>
-            <TouchableOpacity style={[styles.controlButton, { backgroundColor: '#10B981' }]}>
+            <TouchableOpacity 
+              style={[styles.controlButton, { backgroundColor: '#10B981' }]}
+              onPress={() => {
+                updateFlowState({ 
+                  isInFlow: true, 
+                  intensity: Math.min(1, flowState.intensity + 0.2),
+                  entryTime: Date.now()
+                });
+              }}
+            >
               <Play size={20} color="#FFFFFF" />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.controlButton, { backgroundColor: '#F59E0B' }]}>
+            <TouchableOpacity 
+              style={[styles.controlButton, { backgroundColor: '#F59E0B' }]}
+              onPress={() => {
+                updateFlowState({ 
+                  isInFlow: false, 
+                  intensity: Math.max(0, flowState.intensity - 0.3)
+                });
+              }}
+            >
               <Pause size={20} color="#FFFFFF" />
             </TouchableOpacity>
-            <TouchableOpacity style={[styles.controlButton, { backgroundColor: '#6B7280' }]}>
+            <TouchableOpacity 
+              style={[styles.controlButton, { backgroundColor: '#6B7280' }]}
+              onPress={() => {
+                updateFlowState({ 
+                  isInFlow: false, 
+                  intensity: 0,
+                  entryTime: null,
+                  sustainedMinutes: 0
+                });
+              }}
+            >
               <RotateCcw size={20} color="#FFFFFF" />
             </TouchableOpacity>
           </View>
@@ -153,22 +181,58 @@ export default function FlowScreen() {
           </Text>
         
           <View style={styles.triggersList}>
-            <TouchableOpacity style={styles.triggerItem}>
+            <TouchableOpacity 
+              style={styles.triggerItem}
+              onPress={() => {
+                AlertDialog.alert(
+                  'Clear Goals Trigger',
+                  'This trigger activates when you have well-defined, specific objectives. Current status: Active',
+                  [{ text: 'OK' }]
+                );
+              }}
+            >
               <Text style={styles.triggerName}>Clear Goals</Text>
               <View style={[styles.triggerIndicator, { backgroundColor: '#10B981' }]} />
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.triggerItem}>
+            <TouchableOpacity 
+              style={styles.triggerItem}
+              onPress={() => {
+                AlertDialog.alert(
+                  'Immediate Feedback Trigger',
+                  'This trigger activates when you receive quick feedback on your progress. Current status: Active',
+                  [{ text: 'OK' }]
+                );
+              }}
+            >
               <Text style={styles.triggerName}>Immediate Feedback</Text>
               <View style={[styles.triggerIndicator, { backgroundColor: '#3B82F6' }]} />
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.triggerItem}>
+            <TouchableOpacity 
+              style={styles.triggerItem}
+              onPress={() => {
+                AlertDialog.alert(
+                  'Challenge-Skill Balance',
+                  'This trigger activates when task difficulty matches your skill level. Current status: Moderate',
+                  [{ text: 'OK' }]
+                );
+              }}
+            >
               <Text style={styles.triggerName}>Challenge-Skill Balance</Text>
               <View style={[styles.triggerIndicator, { backgroundColor: '#F59E0B' }]} />
             </TouchableOpacity>
             
-            <TouchableOpacity style={styles.triggerItem}>
+            <TouchableOpacity 
+              style={styles.triggerItem}
+              onPress={() => {
+                AlertDialog.alert(
+                  'Deep Concentration Trigger',
+                  'This trigger activates during sustained focus periods. Current status: Active',
+                  [{ text: 'OK' }]
+                );
+              }}
+            >
               <Text style={styles.triggerName}>Deep Concentration</Text>
               <View style={[styles.triggerIndicator, { backgroundColor: '#10B981' }]} />
             </TouchableOpacity>

@@ -20,7 +20,9 @@ import {
   ChevronRight,
   User,
   Settings as SettingsIcon,
+  Album as AlertIcon,
 } from 'lucide-react-native';
+import { Alert } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
 
 interface SettingsSection {
@@ -71,13 +73,35 @@ export default function SettingsScreen() {
           icon: <Database size={24} color="#8B5CF6" />,
           title: 'Data Retention',
           description: 'Configure how long temporal metrics are stored',
-          onPress: () => {},
+          onPress: () => {
+            Alert.alert(
+              'Data Retention Settings',
+              'Configure how long your temporal data is stored:\n\n• 30 days: Basic retention\n• 90 days: Standard retention\n• 1 year: Extended analysis\n• Forever: Complete history',
+              [
+                { text: '30 Days', onPress: () => updateSettings({ dataRetention: 30 }) },
+                { text: '90 Days', onPress: () => updateSettings({ dataRetention: 90 }) },
+                { text: '1 Year', onPress: () => updateSettings({ dataRetention: 365 }) },
+                { text: 'Cancel', style: 'cancel' },
+              ]
+            );
+          },
         },
         {
           icon: <SettingsIcon size={24} color="#EF4444" />,
           title: 'Measurement Precision',
           description: 'Adjust resolution, jitter, and drift sensitivity',
-          onPress: () => {},
+          onPress: () => {
+            Alert.alert(
+              'Measurement Precision',
+              'Adjust temporal measurement sensitivity:\n\n• High: Sub-minute precision\n• Medium: 5-minute blocks\n• Low: 15-minute blocks',
+              [
+                { text: 'High Precision', onPress: () => updateSettings({ precision: 'high' }) },
+                { text: 'Medium Precision', onPress: () => updateSettings({ precision: 'medium' }) },
+                { text: 'Low Precision', onPress: () => updateSettings({ precision: 'low' }) },
+                { text: 'Cancel', style: 'cancel' },
+              ]
+            );
+          },
         },
       ],
     },
@@ -88,7 +112,39 @@ export default function SettingsScreen() {
           icon: <Bell size={24} color="#06B6D4" />,
           title: 'Notifications',
           description: 'Flow alerts, nudges, and system notifications',
-          onPress: () => {},
+          onPress: () => {
+            Alert.alert(
+              'Notification Settings',
+              'Configure your notification preferences:',
+              [
+                { 
+                  text: 'Enable All', 
+                  onPress: () => updateSettings({ 
+                    nudgeNotifications: true, 
+                    flowAlerts: true,
+                    breakReminders: true 
+                  }) 
+                },
+                { 
+                  text: 'Flow Only', 
+                  onPress: () => updateSettings({ 
+                    nudgeNotifications: false, 
+                    flowAlerts: true,
+                    breakReminders: false 
+                  }) 
+                },
+                { 
+                  text: 'Disable All', 
+                  onPress: () => updateSettings({ 
+                    nudgeNotifications: false, 
+                    flowAlerts: false,
+                    breakReminders: false 
+                  }) 
+                },
+                { text: 'Cancel', style: 'cancel' },
+              ]
+            );
+          },
         },
         {
           icon: <Palette size={24} color="#EC4899" />,
@@ -105,13 +161,33 @@ export default function SettingsScreen() {
           icon: <HelpCircle size={24} color="#84CC16" />,
           title: 'Help & Documentation',
           description: 'Learn about time metrology and Chrona features',
-          onPress: () => {},
+          onPress: () => {
+            Alert.alert(
+              'Help & Documentation',
+              'Chrona Help Topics:\n\n• Time Metrology Basics\n• Flow State Detection\n• Privacy & Security\n• Nudge System\n• Data Export\n• Troubleshooting',
+              [
+                { text: 'View Online Help', onPress: () => {} },
+                { text: 'Contact Support', onPress: () => {} },
+                { text: 'Close', style: 'cancel' },
+              ]
+            );
+          },
         },
         {
           icon: <Info size={24} color="#6B7280" />,
           title: 'About Chrona',
           description: 'Version info, credits, and philosophy',
-          onPress: () => {},
+          onPress: () => {
+            Alert.alert(
+              'About Chrona',
+              'Chrona v1.0.0\n\nA precision productivity platform built on principles of temporal metrology, privacy-first design, and human flourishing.\n\nBuilt with React Native & Expo\nDesigned for mindful productivity',
+              [
+                { text: 'View Credits', onPress: () => {} },
+                { text: 'Privacy Policy', onPress: () => router.push('/privacy-dashboard') },
+                { text: 'Close', style: 'cancel' },
+              ]
+            );
+          },
         },
       ],
     },
