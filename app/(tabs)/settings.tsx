@@ -48,7 +48,7 @@ interface SettingsItem {
 }
 
 export default function SettingsScreen() {
-  const { settings, updateSettings } = useChrona();
+  const { settings, updateSettings, startTour, startDefaultTour } = useChrona();
 
   const settingsSections: SettingsSection[] = [
     {
@@ -261,6 +261,14 @@ export default function SettingsScreen() {
         {settingsSections.map(renderSettingsSection)}
         
         <View style={styles.footer}>
+          <TouchableOpacity 
+            style={styles.tourButton}
+            onPress={() => startDefaultTour()}
+          >
+            <HelpCircle size={20} color="#FFFFFF" />
+            <Text style={styles.tourButtonText}>Take App Tour</Text>
+          </TouchableOpacity>
+          
           <Text style={styles.footerText}>
             Chrona v1.0.0 • Productivity Platform
           </Text>
@@ -382,5 +390,27 @@ const styles = StyleSheet.create({
     fontSize: 14,
     color: '#9CA3AF',
     textAlign: 'center',
+  },
+  
+  // Tour button
+  tourButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#6366F1',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 24,
+    marginBottom: 24,
+    gap: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 3,
+  },
+  tourButtonText: {
+    color: '#FFFFFF',
+    fontSize: 16,
+    fontWeight: '600',
   },
 });

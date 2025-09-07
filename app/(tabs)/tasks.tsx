@@ -44,7 +44,20 @@ type FilterType = 'all' | 'today' | 'upcoming' | 'completed' | 'active';
 type ViewType = 'list' | 'calendar' | 'timeline';
 
 export default function TasksScreen() {
-  const { tasks, activeTask, addTask, updateTask, startTask, pauseTask, completeTask } = useChrona();
+  const { 
+    tasks, 
+    activeTask, 
+    addTask, 
+    updateTask, 
+    startTask, 
+    pauseTask, 
+    completeTask,
+    getTasksWithCalendarContext,
+    getAnalyticsWithCalendar,
+    createTaskFromEvent,
+    calendarEvents,
+    startTour
+  } = useChrona();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
   const [filter, setFilter] = useState<FilterType>('all');
@@ -515,6 +528,34 @@ export default function TasksScreen() {
                   <Text style={styles.planButtonText}>Plan Itinerary</Text>
                 </TouchableOpacity>
               </View>
+              <TouchableOpacity 
+                style={styles.tourButton}
+                onPress={() => {
+                  const tourSteps = [
+                    {
+                      id: 'welcome',
+                      title: 'Welcome to Chrona',
+                      description: 'Your enterprise-grade time management companion. Let\'s explore the key features.',
+                      position: { x: 20, y: 100, width: 300, height: 60 }
+                    },
+                    {
+                      id: 'tasks',
+                      title: 'Task Management',
+                      description: 'Create, track, and optimize your tasks with advanced analytics and calendar integration.',
+                      position: { x: 20, y: 200, width: 300, height: 100 }
+                    },
+                    {
+                      id: 'analytics',
+                      title: 'Smart Analytics',
+                      description: 'View real-time insights about your productivity, including calendar conflicts and focus time.',
+                      position: { x: 20, y: 320, width: 300, height: 80 }
+                    }
+                  ];
+                  startTour(tourSteps);
+                }}
+              >
+                <Text style={styles.tourButtonText}>Take Tour</Text>
+              </TouchableOpacity>
             </View>
           ) : (
             <>
@@ -1119,5 +1160,21 @@ const styles = StyleSheet.create({
     fontSize: Typography.fontSize.sm,
     fontWeight: Typography.fontWeight.medium,
     color: Colors.accent[600],
+  },
+  
+  // Tour button
+  tourButton: {
+    backgroundColor: Colors.info[600],
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.lg,
+    marginTop: Spacing.sm,
+    alignSelf: 'center',
+  },
+  tourButtonText: {
+    color: Colors.text.inverse,
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.semibold,
+    textAlign: 'center',
   },
 });

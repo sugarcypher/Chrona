@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { Task, TimeBlock, FlowState, ChronoFingerprint, Nudge, TimeMetrics } from '@/types/chrona';
+import { Task, TimeBlock, FlowState, ChronoFingerprint, Nudge, TimeMetrics, CalendarEvent } from '@/types/chrona';
 import { default as OnboardingTourComponent, TourStep } from '@/components/ui/OnboardingTour';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
+import { useCalendar } from '@/providers/CalendarProvider';
 
 interface ChronaContextValue {
   tasks: Task[];
@@ -16,6 +17,18 @@ interface ChronaContextValue {
   nudgeLedger: Nudge[];
   nudgeSettings: any;
   settings: any;
+  
+  // Calendar integration
+  calendarEvents: CalendarEvent[];
+  getTasksWithCalendarContext: () => (Task & { calendarEvents: CalendarEvent[]; conflictScore: number })[];
+  createTaskFromEvent: (event: CalendarEvent) => void;
+  getAnalyticsWithCalendar: () => {
+    totalScheduledTime: number;
+    actualWorkTime: number;
+    meetingOverhead: number;
+    focusTimeBlocks: number;
+    interruptionRate: number;
+  };
   
   addTask: (task: Omit<Task, 'id' | 'createdAt' | 'actualMinutes'>) => void;
   updateTask: (id: string, updates: Partial<Task>) => void;
@@ -34,6 +47,7 @@ interface ChronaContextValue {
   
   // Onboarding tour
   startTour: (steps: TourStep[]) => void;
+  startDefaultTour: () => void;
   showTour: boolean;
 }
 
@@ -62,6 +76,9 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
     nudgeNotifications: true,
     flowAlerts: true,
   });
+  
+  // Calendar integration
+  const { events: calendarEvents } = useCalendar();
 
   // Load data from AsyncStorage
   useEffect(() => {
@@ -248,6 +265,98 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
     setSettings(prev => ({ ...prev, ...newSettings }));
   }, []);
 
+  // Calendar integration functions
+  const getTasksWithCalendarContext = useCallback(() => {
+    return tasks.map(task => {
+      const taskStart = task.startedAt || task.createdAt;
+      const taskEnd = taskStart + (task.estimatedMinutes * 60 * 1000);
+      
+      // Find overlapping calendar events
+      const overlappingEvents = calendarEvents.filter(event => {
+        return (event.startTime <= taskEnd && event.endTime >= taskStart);
+      });
+      
+      // Calculate conflict score based on overlaps
+      const conflictScore = overlappingEvents.reduce((score, event) => {
+        const overlapStart = Math.max(taskStart, event.startTime);
+        const overlapEnd = Math.min(taskEnd, event.endTime);
+        const overlapDuration = Math.max(0, overlapEnd - overlapStart);
+        return score + (overlapDuration / (task.estimatedMinutes * 60 * 1000));
+      }, 0);
+      
+      return {
+        ...task,
+        calendarEvents: overlappingEvents,
+        conflictScore: Math.min(1, conflictScore),
+      };
+    });
+  }, [tasks, calendarEvents]);
+  
+  const createTaskFromEvent = useCallback((event: CalendarEvent) => {
+    const estimatedMinutes = Math.round((event.endTime - event.startTime) / (60 * 1000));
+    
+    addTask({
+      title: event.title,
+      estimatedMinutes,
+      minMinutes: Math.max(15, Math.round(estimatedMinutes * 0.7)),
+      maxMinutes: Math.round(estimatedMinutes * 1.5),
+      powerLawExponent: 1.5,
+      contextSwitchCost: 5,
+      verificationCriteria: event.description ? [event.description] : [],
+      satisficingThreshold: 0.8,
+    });
+  }, [addTask]);
+  
+  const getAnalyticsWithCalendar = useCallback(() => {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const tomorrow = new Date(today);
+    tomorrow.setDate(tomorrow.getDate() + 1);
+    
+    const todayEvents = calendarEvents.filter(event => 
+      event.startTime >= today.getTime() && event.startTime < tomorrow.getTime()
+    );
+    
+    const todayTasks = tasks.filter(task => 
+      task.createdAt >= today.getTime() && task.createdAt < tomorrow.getTime()
+    );
+    
+    const totalScheduledTime = todayEvents.reduce((total, event) => 
+      total + (event.endTime - event.startTime), 0
+    ) / (60 * 1000); // Convert to minutes
+    
+    const actualWorkTime = todayTasks.reduce((total, task) => 
+      total + task.actualMinutes, 0
+    );
+    
+    const meetingEvents = todayEvents.filter(event => 
+      event.title.toLowerCase().includes('meeting') || 
+      event.title.toLowerCase().includes('call') ||
+      (event.attendees && event.attendees.length > 1)
+    );
+    
+    const meetingOverhead = meetingEvents.reduce((total, event) => 
+      total + (event.endTime - event.startTime), 0
+    ) / (60 * 1000);
+    
+    const focusTimeBlocks = timeBlocks.filter(block => 
+      block.startTime >= today.getTime() && 
+      block.startTime < tomorrow.getTime() &&
+      block.flowIntensity > 0.6
+    ).length;
+    
+    const interruptionRate = todayTasks.length > 0 ? 
+      todayTasks.filter(task => task.actualMinutes > task.estimatedMinutes * 1.2).length / todayTasks.length : 0;
+    
+    return {
+      totalScheduledTime,
+      actualWorkTime,
+      meetingOverhead,
+      focusTimeBlocks,
+      interruptionRate,
+    };
+  }, [calendarEvents, tasks, timeBlocks]);
+
   const clearAllData = useCallback(async () => {
     setTasks([]);
     setTimeBlocks([]);
@@ -264,7 +373,7 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
     ]);
   }, []);
 
-  const { startTour, showTour } = useOnboardingTour();
+  const { startTour, startDefaultTour, showTour } = useOnboardingTour();
 
   return {
     tasks,
@@ -277,6 +386,12 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
     nudgeLedger,
     nudgeSettings,
     settings,
+    
+    // Calendar integration
+    calendarEvents,
+    getTasksWithCalendarContext,
+    createTaskFromEvent,
+    getAnalyticsWithCalendar,
     
     addTask,
     updateTask,
@@ -294,6 +409,7 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
     clearAllData,
     
     startTour,
+    startDefaultTour,
     showTour,
   };
 });

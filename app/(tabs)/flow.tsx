@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import {
   StyleSheet,
   Text,
@@ -15,7 +15,8 @@ import { Alert as AlertDialog } from 'react-native';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, Layout } from '@/constants/design';
 
 export default function FlowScreen() {
-  const { flowState, activeTask, updateFlowState, settings } = useChrona();
+  const { flowState, activeTask, updateFlowState, settings, startTour, getAnalyticsWithCalendar } = useChrona();
+  const analytics = useMemo(() => getAnalyticsWithCalendar(), [getAnalyticsWithCalendar]);
   const [pulseAnim] = useState(new Animated.Value(1));
   const [microPatterns, setMicroPatterns] = useState({
     keystrokeRhythm: 0.75,
@@ -356,6 +357,33 @@ export default function FlowScreen() {
           </View>
         )}
 
+        {/* Focus Analytics */}
+        <View style={styles.analyticsCard}>
+          <Text style={styles.sectionTitle}>Focus Analytics</Text>
+          <View style={styles.analyticsGrid}>
+            <View style={styles.analyticsItem}>
+              <Text style={styles.analyticsLabel}>Focus Blocks</Text>
+              <Text style={styles.analyticsValue}>{analytics.focusTimeBlocks}</Text>
+              <Text style={styles.analyticsDescription}>Deep work sessions</Text>
+            </View>
+            <View style={styles.analyticsItem}>
+              <Text style={styles.analyticsLabel}>Interruption Rate</Text>
+              <Text style={styles.analyticsValue}>{Math.round(analytics.interruptionRate * 100)}%</Text>
+              <Text style={styles.analyticsDescription}>Task overruns</Text>
+            </View>
+            <View style={styles.analyticsItem}>
+              <Text style={styles.analyticsLabel}>Meeting Overhead</Text>
+              <Text style={styles.analyticsValue}>{Math.round(analytics.meetingOverhead)}m</Text>
+              <Text style={styles.analyticsDescription}>Non-productive time</Text>
+            </View>
+            <View style={styles.analyticsItem}>
+              <Text style={styles.analyticsLabel}>Work Time</Text>
+              <Text style={styles.analyticsValue}>{Math.round(analytics.actualWorkTime)}m</Text>
+              <Text style={styles.analyticsDescription}>Productive time</Text>
+            </View>
+          </View>
+        </View>
+        
         {/* Flow History */}
         <View style={styles.historyCard}>
           <Text style={styles.sectionTitle}>Today's Flow Sessions</Text>
@@ -384,6 +412,35 @@ export default function FlowScreen() {
               </View>
             </View>
           ))}
+          
+          <TouchableOpacity 
+            style={styles.tourButton}
+            onPress={() => {
+              const focusTourSteps = [
+                {
+                  id: 'flow-state',
+                  title: 'Flow State Monitoring',
+                  description: 'Track your focus intensity in real-time. The larger circle indicates deeper flow states.',
+                  position: { x: 20, y: 200, width: 300, height: 200 }
+                },
+                {
+                  id: 'flow-controls',
+                  title: 'Flow Controls',
+                  description: 'Use these controls to manually adjust your flow state or reset when taking breaks.',
+                  position: { x: 20, y: 420, width: 300, height: 80 }
+                },
+                {
+                  id: 'micro-patterns',
+                  title: 'Micro-Pattern Detection',
+                  description: 'Privacy-preserving analysis of your typing and interaction patterns to optimize focus.',
+                  position: { x: 20, y: 520, width: 300, height: 120 }
+                }
+              ];
+              startTour(focusTourSteps);
+            }}
+          >
+            <Text style={styles.tourButtonText}>Learn About Focus Tracking</Text>
+          </TouchableOpacity>
         </View>
       </ScrollView>
     </SafeAreaView>
@@ -674,5 +731,61 @@ const styles = StyleSheet.create({
     color: Colors.text.primary,
     fontSize: Typography.fontSize.sm,
     lineHeight: Typography.lineHeight.normal * Typography.fontSize.sm,
+  },
+  
+  // Analytics card
+  analyticsCard: {
+    backgroundColor: Colors.background.primary,
+    marginHorizontal: Layout.screenPadding,
+    marginBottom: Spacing.xl,
+    padding: Spacing['2xl'],
+    borderRadius: BorderRadius['2xl'],
+    ...Shadows.lg,
+  },
+  analyticsGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 16,
+  },
+  analyticsItem: {
+    flex: 1,
+    minWidth: '45%',
+    alignItems: 'center',
+    backgroundColor: Colors.background.tertiary,
+    padding: Spacing.md,
+    borderRadius: BorderRadius.lg,
+  },
+  analyticsLabel: {
+    fontSize: Typography.fontSize.xs,
+    color: Colors.text.tertiary,
+    marginBottom: Spacing.xs,
+    textAlign: 'center',
+  },
+  analyticsValue: {
+    fontSize: Typography.fontSize.xl,
+    fontWeight: Typography.fontWeight.bold,
+    color: Colors.text.primary,
+    marginBottom: Spacing.xs,
+  },
+  analyticsDescription: {
+    fontSize: 10,
+    color: Colors.text.quaternary,
+    textAlign: 'center',
+  },
+  
+  // Tour button
+  tourButton: {
+    backgroundColor: Colors.accent[600],
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    marginTop: Spacing.lg,
+    ...Shadows.sm,
+  },
+  tourButtonText: {
+    color: Colors.text.inverse,
+    fontSize: Typography.fontSize.sm,
+    fontWeight: Typography.fontWeight.semibold,
+    textAlign: 'center',
   },
 });

@@ -7,8 +7,9 @@ import {
   Animated,
   Modal,
   Dimensions,
+  StatusBar,
 } from 'react-native';
-import { X, ArrowRight, ArrowLeft } from 'lucide-react-native';
+import { X, ArrowRight, ArrowLeft, Sparkles, Target, Calendar, BarChart3, Brain } from 'lucide-react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const { height } = Dimensions.get('window');
@@ -144,6 +145,14 @@ export default function OnboardingTour({ steps, visible, onComplete, onSkip }: O
             </TouchableOpacity>
           </View>
 
+          <View style={styles.tourIconContainer}>
+            {currentStepData.id === 'welcome' && <Sparkles size={24} color="#0EA5E9" />}
+            {currentStepData.id === 'tasks' && <Target size={24} color="#10B981" />}
+            {currentStepData.id === 'calendar' && <Calendar size={24} color="#8B5CF6" />}
+            {currentStepData.id === 'analytics' && <BarChart3 size={24} color="#F59E0B" />}
+            {currentStepData.id === 'focus' && <Brain size={24} color="#EC4899" />}
+            {!['welcome', 'tasks', 'calendar', 'analytics', 'focus'].includes(currentStepData.id) && <Sparkles size={24} color="#0EA5E9" />}
+          </View>
           <Text style={styles.tourTitle}>{currentStepData.title}</Text>
           <Text style={styles.tourDescription}>{currentStepData.description}</Text>
 
@@ -212,16 +221,16 @@ const styles = StyleSheet.create({
     position: 'absolute',
     left: 20,
     right: 20,
-    backgroundColor: '#111111',
-    borderRadius: 16,
-    padding: 20,
+    backgroundColor: '#FFFFFF',
+    borderRadius: 20,
+    padding: 24,
     borderWidth: 1,
-    borderColor: '#1F1F1F',
+    borderColor: 'rgba(14, 165, 233, 0.2)',
     shadowColor: '#000000',
-    shadowOffset: { width: 0, height: 4 },
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.15,
+    shadowRadius: 16,
+    elevation: 12,
   },
   tourHeader: {
     flexDirection: 'row',
@@ -232,10 +241,10 @@ const styles = StyleSheet.create({
   stepIndicator: {
     backgroundColor: 'rgba(14, 165, 233, 0.1)',
     paddingHorizontal: 12,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
     borderWidth: 1,
-    borderColor: 'rgba(14, 165, 233, 0.2)',
+    borderColor: 'rgba(14, 165, 233, 0.3)',
   },
   stepText: {
     color: '#0EA5E9',
@@ -245,17 +254,29 @@ const styles = StyleSheet.create({
   closeButton: {
     padding: 4,
   },
+  tourIconContainer: {
+    alignSelf: 'center',
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: 'rgba(14, 165, 233, 0.1)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
   tourTitle: {
-    fontSize: 20,
+    fontSize: 22,
     fontWeight: '700',
-    color: '#FFFFFF',
-    marginBottom: 8,
+    color: '#1F2937',
+    marginBottom: 12,
+    textAlign: 'center',
   },
   tourDescription: {
     fontSize: 16,
-    color: '#9CA3AF',
-    lineHeight: 22,
-    marginBottom: 24,
+    color: '#6B7280',
+    lineHeight: 24,
+    marginBottom: 28,
+    textAlign: 'center',
   },
   tourNavigation: {
     flexDirection: 'row',
@@ -278,25 +299,27 @@ const styles = StyleSheet.create({
   },
   navButtonText: {
     color: '#FFFFFF',
-    fontSize: 14,
+    fontSize: 15,
     fontWeight: '600',
   },
   navButtonTextDisabled: {
-    color: '#6B7280',
+    color: '#9CA3AF',
   },
   progressContainer: {
     flexDirection: 'row',
     gap: 6,
   },
   progressDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: '#374151',
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    backgroundColor: '#E5E7EB',
   },
   progressDotActive: {
     backgroundColor: '#0EA5E9',
-    width: 20,
+    width: 24,
+    height: 8,
+    borderRadius: 4,
   },
   progressDotCompleted: {
     backgroundColor: '#10B981',
