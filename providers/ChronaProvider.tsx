@@ -79,7 +79,12 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
   
   // Calendar integration
   const calendarContext = useCalendar();
-  const calendarEvents = useMemo(() => calendarContext?.events || [], [calendarContext?.events]);
+  const calendarEvents = useMemo(() => {
+    if (!calendarContext || !calendarContext.events) {
+      return [];
+    }
+    return calendarContext.events;
+  }, [calendarContext]);
 
   // Load data from AsyncStorage
   useEffect(() => {

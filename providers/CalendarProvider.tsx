@@ -41,7 +41,7 @@ interface CalendarContextValue {
   clearAllData: () => Promise<void>;
 }
 
-export const [CalendarContextProviderComponent, useCalendar] = createContextHook<CalendarContextValue>(() => {
+export const [CalendarContextProviderComponent, useCalendarInternal] = createContextHook<CalendarContextValue>(() => {
   const [integrations, setIntegrations] = useState<CalendarIntegration[]>([]);
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [scrapedData, setScrapedData] = useState<ScrapedData[]>([]);
@@ -300,6 +300,15 @@ export const [CalendarContextProviderComponent, useCalendar] = createContextHook
     clearAllData,
   };
 });
+
+export function useCalendar(): CalendarContextValue | null {
+  try {
+    return useCalendarInternal();
+  } catch (error) {
+    console.warn('Calendar context not available:', error);
+    return null;
+  }
+}
 
 export function CalendarProvider({ children }: { children: React.ReactNode }) {
   return (
