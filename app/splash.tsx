@@ -403,7 +403,7 @@ export default function SplashScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-            <Text style={styles.primaryButtonText}>Begin Enterprise Setup</Text>
+            <Text style={styles.primaryButtonText}>Start Time Mastery</Text>
             <ArrowRight size={20} color={Colors.background.primary} strokeWidth={2} />
           </LinearGradient>
         </TouchableOpacity>
@@ -534,7 +534,7 @@ const styles = StyleSheet.create({
   stepContainer: {
     flex: 1,
     justifyContent: 'space-between',
-    paddingVertical: Spacing['5xl'],
+    paddingVertical: Spacing['2xl'],
   },
   particleContainer: {
     position: 'absolute',
@@ -558,7 +558,8 @@ const styles = StyleSheet.create({
   },
   logoContainer: {
     alignItems: 'center',
-    marginTop: Spacing['4xl'],
+    marginTop: Spacing['2xl'],
+    marginBottom: Spacing.lg,
     zIndex: 2,
   },
   logoWrapper: {
@@ -611,37 +612,39 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   logoText: {
-    fontSize: 42,
+    fontSize: 36,
     fontWeight: '700' as const,
     color: Colors.text.inverse,
-    letterSpacing: -0.5,
+    letterSpacing: -0.8,
     textAlign: 'center' as const,
     marginBottom: Spacing.sm,
+    lineHeight: 40,
   },
   tagline: {
-    fontSize: 16,
+    fontSize: 14,
     color: Colors.primary[300],
     textAlign: 'center' as const,
-    letterSpacing: 0.5,
+    letterSpacing: 0.3,
     fontWeight: '400' as const,
-    lineHeight: 20,
-    paddingHorizontal: Spacing.lg,
+    lineHeight: 18,
+    paddingHorizontal: Spacing.xl,
+    marginTop: Spacing.xs,
   },
   descriptionContainer: {
     flex: 1,
     justifyContent: 'center',
-    paddingVertical: Spacing['3xl'],
+    paddingVertical: Spacing.xl,
     zIndex: 2,
   },
   description: {
-    fontSize: 17,
+    fontSize: 16,
     color: Colors.primary[200],
-    lineHeight: 26,
+    lineHeight: 24,
     textAlign: 'center' as const,
-    marginBottom: Spacing['4xl'],
-    fontWeight: '500' as const,
-    paddingHorizontal: Spacing.xl,
-    letterSpacing: 0.2,
+    marginBottom: Spacing['3xl'],
+    fontWeight: '400' as const,
+    paddingHorizontal: Spacing['2xl'],
+    letterSpacing: 0.1,
   },
   featureGrid: {
     flexDirection: 'row',
@@ -669,18 +672,18 @@ const styles = StyleSheet.create({
     marginBottom: Spacing.md,
   },
   featureTitle: {
-    fontSize: 14,
+    fontSize: 13,
     fontWeight: '600' as const,
     color: Colors.text.inverse,
     textAlign: 'center' as const,
     marginBottom: Spacing.xs,
-    lineHeight: 18,
+    lineHeight: 16,
   },
   featureSubtitle: {
-    fontSize: 12,
+    fontSize: 11,
     color: Colors.primary[400],
     textAlign: 'center' as const,
-    lineHeight: 16,
+    lineHeight: 14,
     fontWeight: '400' as const,
   },
   ctaContainer: {
