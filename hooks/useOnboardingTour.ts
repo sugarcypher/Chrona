@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TourStep } from '@/components/ui/OnboardingTour';
 import { Dimensions } from 'react-native';
@@ -9,30 +9,7 @@ export function useOnboardingTour() {
   const [showTour, setShowTour] = useState(false);
   const [tourSteps, setTourSteps] = useState<TourStep[]>([]);
 
-  useEffect(() => {
-    checkTourStatus();
-  }, []);
-
-  const checkTourStatus = async () => {
-    try {
-      const [hasLaunched, tourCompleted] = await Promise.all([
-        AsyncStorage.getItem('chrona_has_launched'),
-        AsyncStorage.getItem('chrona_tour_completed'),
-      ]);
-
-      if (!hasLaunched || !tourCompleted) {
-        // Mark as launched and show tour after a brief delay
-        await AsyncStorage.setItem('chrona_has_launched', 'true');
-        setTimeout(() => {
-          startDefaultTour();
-        }, 2000);
-      }
-    } catch (error) {
-      console.error('Error checking tour status:', error);
-    }
-  };
-
-  const startDefaultTour = () => {
+  const startDefaultTour = useCallback(() => {
     const defaultSteps: TourStep[] = [
       {
         id: 'welcome',
@@ -74,21 +51,54 @@ export function useOnboardingTour() {
     
     setTourSteps(defaultSteps);
     setShowTour(true);
-  };
+  }, []);
+
+  const checkTourStatus = useCallback(async () => {
+    try {
+      const [hasLaunched, tourCompleted] = await Promise.all([
+        AsyncStorage.getItem('chrona_has_launched'),
+        AsyncStorage.getItem('chrona_tour_completed'),
+      ]);
+
+      if (!hasLaunched || !tourCompleted) {
+        // Mark as launched and show tour after a brief delay
+        await AsyncStorage.setItem('chrona_has_launched', 'true');
+        setTimeout(() => {
+          startDefaultTour();
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Error checking tour status:', error);
+    }
+  }, [startDefaultTour]);
+
+  useEffect(() => {
+    checkTourStatus();
+  }, [checkTourStatus]);
 
   const startTour = (steps: TourStep[]) => {
     setTourSteps(steps);
     setShowTour(true);
   };
 
-  const completeTour = () => {
-    setShowTour(false);
-    setTourSteps([]);
+  const completeTour = async () => {
+    try {
+      await AsyncStorage.setItem('chrona_tour_completed', 'true');
+      setShowTour(false);
+      setTourSteps([]);
+    } catch (error) {
+      console.error('Error completing tour:', error);
+    }
   };
 
-  const skipTour = () => {
-    setShowTour(false);
-    setTourSteps([]);
+  const skipTour = async () => {
+    try {
+      await AsyncStorage.setItem('chrona_tour_completed', 'true');
+      setShowTour(false);
+      setTourSteps([]);
+    } catch (error) {
+      console.error('Error skipping tour:', error);
+    }
   };
 
   return {
