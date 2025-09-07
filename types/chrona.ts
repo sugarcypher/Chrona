@@ -54,3 +54,65 @@ export interface Nudge {
   mechanism: string;
   tradeoff: string;
 }
+
+export interface CalendarEvent {
+  id: string;
+  title: string;
+  description?: string;
+  startTime: number;
+  endTime: number;
+  location?: string;
+  attendees?: string[];
+  source: 'google' | 'outlook' | 'apple' | 'manual' | 'scraped';
+  sourceId?: string;
+  isAllDay: boolean;
+  recurrence?: {
+    frequency: 'daily' | 'weekly' | 'monthly' | 'yearly';
+    interval: number;
+    endDate?: number;
+  };
+  reminders?: {
+    method: 'popup' | 'email';
+    minutes: number;
+  }[];
+  status: 'confirmed' | 'tentative' | 'cancelled';
+  visibility: 'public' | 'private';
+  createdAt: number;
+  updatedAt: number;
+}
+
+export interface CalendarIntegration {
+  id: string;
+  provider: 'google' | 'outlook' | 'apple' | 'ical';
+  name: string;
+  email?: string;
+  isConnected: boolean;
+  lastSync: number;
+  syncEnabled: boolean;
+  calendarIds: string[];
+  accessToken?: string;
+  refreshToken?: string;
+  expiresAt?: number;
+}
+
+export interface ScrapedData {
+  id: string;
+  source: string;
+  url?: string;
+  type: 'calendar' | 'schedule' | 'agenda' | 'meeting';
+  data: any;
+  extractedEvents: CalendarEvent[];
+  scrapedAt: number;
+  confidence: number;
+  status: 'pending' | 'processed' | 'failed';
+}
+
+export interface SyncStatus {
+  isRunning: boolean;
+  lastSync: number;
+  nextSync: number;
+  errors: string[];
+  eventsAdded: number;
+  eventsUpdated: number;
+  eventsDeleted: number;
+}

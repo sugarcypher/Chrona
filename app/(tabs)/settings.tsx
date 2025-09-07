@@ -26,6 +26,7 @@ import {
   Users,
   Globe,
   Zap,
+  Calendar,
 } from 'lucide-react-native';
 import { useChrona } from '@/providers/ChronaProvider';
 import { Colors, Typography, Spacing, BorderRadius, Shadows, Layout } from '@/constants/design';
@@ -110,6 +111,18 @@ export default function SettingsScreen() {
               ]
             );
           },
+        },
+      ],
+    },
+    {
+      title: 'Integrations',
+      items: [
+        {
+          icon: <Calendar size={24} color="#6366F1" />,
+          title: 'Calendar Integration',
+          description: 'Connect Google, Outlook, Apple calendars and scrape data',
+          onPress: () => router.push('/calendar-integrations'),
+          badge: 'New',
         },
       ],
     },

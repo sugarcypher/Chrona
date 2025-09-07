@@ -10,6 +10,8 @@ import {
   Alert,
 } from 'react-native';
 import { useChrona } from '@/providers/ChronaProvider';
+import { useCalendar } from '@/providers/CalendarProvider';
+import { CalendarEvent } from '@/types/chrona';
 import {
   ChevronLeft,
   ChevronRight,
@@ -29,6 +31,7 @@ type ViewMode = 'month' | 'week' | 'day';
 
 export default function CalendarViewScreen() {
   const { tasks, timeBlocks, activeTask } = useChrona();
+  const { getEventsForDate } = useCalendar();
   const [currentDate, setCurrentDate] = useState(new Date());
   const [viewMode, setViewMode] = useState<ViewMode>('month');
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
@@ -146,6 +149,7 @@ export default function CalendarViewScreen() {
 
     const dayTasks = getTasksForDate(selectedDate);
     const dayBlocks = getTimeBlocksForDate(selectedDate);
+    const dayEvents = getEventsForDate(selectedDate);
     const totalMinutes = dayBlocks.reduce((sum, block) => sum + block.duration, 0);
 
     return (
@@ -171,6 +175,10 @@ export default function CalendarViewScreen() {
           <View style={styles.dayStat}>
             <Text style={styles.dayStatValue}>{Math.round(totalMinutes / 60 * 10) / 10}h</Text>
             <Text style={styles.dayStatLabel}>Focus Time</Text>
+          </View>
+          <View style={styles.dayStat}>
+            <Text style={styles.dayStatValue}>{dayEvents.length}</Text>
+            <Text style={styles.dayStatLabel}>Events</Text>
           </View>
         </View>
 
@@ -225,6 +233,43 @@ export default function CalendarViewScreen() {
                 </View>
               );
             })}
+          </View>
+        )}
+
+        {dayEvents.length > 0 && (
+          <View style={styles.dayEventsList}>
+            <Text style={styles.sectionTitle}>Calendar Events</Text>
+            {dayEvents.map(event => (
+              <View key={event.id} style={styles.dayEventItem}>
+                <View style={[
+                  styles.eventSourceDot,
+                  { backgroundColor: getEventSourceColor(event.source) }
+                ]} />
+                <View style={styles.eventContent}>
+                  <Text style={styles.dayEventTitle}>{event.title}</Text>
+                  <Text style={styles.dayEventTime}>
+                    {new Date(event.startTime).toLocaleTimeString('en-US', { 
+                      hour: 'numeric', 
+                      minute: '2-digit',
+                      hour12: true 
+                    })} - {new Date(event.endTime).toLocaleTimeString('en-US', { 
+                      hour: 'numeric', 
+                      minute: '2-digit',
+                      hour12: true 
+                    })}
+                  </Text>
+                  {event.location && (
+                    <Text style={styles.dayEventLocation}>{event.location}</Text>
+                  )}
+                </View>
+                <View style={[
+                  styles.eventSourceBadge,
+                  { backgroundColor: getEventSourceColor(event.source) }
+                ]}>
+                  <Text style={styles.eventSourceText}>{event.source}</Text>
+                </View>
+              </View>
+            ))}
           </View>
         )}
       </View>
@@ -355,10 +400,10 @@ export default function CalendarViewScreen() {
         <View style={styles.quickActions}>
           <TouchableOpacity 
             style={styles.quickActionButton}
-            onPress={() => router.push('/(tabs)/tasks')}
+            onPress={() => router.push('/calendar-integrations')}
           >
             <Calendar size={20} color="#6366F1" />
-            <Text style={styles.quickActionText}>Plan Itinerary</Text>
+            <Text style={styles.quickActionText}>Calendar Integration</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -756,4 +801,59 @@ const styles = StyleSheet.create({
     fontWeight: '500',
     color: '#1F2937',
   },
+  dayEventsList: {
+    marginBottom: 20,
+  },
+  dayEventItem: {
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    paddingVertical: 12,
+    gap: 12,
+  },
+  eventSourceDot: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginTop: 4,
+  },
+  eventContent: {
+    flex: 1,
+  },
+  dayEventTitle: {
+    fontSize: 14,
+    color: '#1F2937',
+    fontWeight: '500',
+    marginBottom: 2,
+  },
+  dayEventTime: {
+    fontSize: 12,
+    color: '#6B7280',
+    marginBottom: 2,
+  },
+  dayEventLocation: {
+    fontSize: 12,
+    color: '#9CA3AF',
+  },
+  eventSourceBadge: {
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+    borderRadius: 8,
+  },
+  eventSourceText: {
+    fontSize: 10,
+    fontWeight: '600',
+    color: '#FFFFFF',
+    textTransform: 'uppercase',
+  },
 });
+
+function getEventSourceColor(source: string): string {
+  switch (source) {
+    case 'google': return '#EA4335';
+    case 'outlook': return '#0078D4';
+    case 'apple': return '#007AFF';
+    case 'scraped': return '#10B981';
+    case 'manual': return '#6366F1';
+    default: return '#9CA3AF';
+  }
+}

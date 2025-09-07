@@ -6,6 +6,7 @@ import { View } from "react-native";
 
 import { GestureHandlerRootView } from "react-native-gesture-handler";
 import { ChronaProvider } from "@/providers/ChronaProvider";
+import { CalendarProvider } from "@/providers/CalendarProvider";
 import { StatusBar } from "expo-status-bar";
 import GlyphHeader from '@/components/ui/GlyphHeader';
 
@@ -120,6 +121,18 @@ function RootLayoutNav() {
           ),
         }} 
       />
+      <Stack.Screen 
+        name="calendar-integrations" 
+        options={{ 
+          title: "Calendar Integration",
+          presentation: "modal",
+          headerTitle: () => (
+            <View style={{ alignItems: 'center', justifyContent: 'center' }}>
+              <GlyphHeader />
+            </View>
+          ),
+        }} 
+      />
     </Stack>
   );
 }
@@ -151,8 +164,10 @@ export default function RootLayout() {
     <QueryClientProvider client={queryClient}>
       <GestureHandlerRootView style={{ flex: 1 }}>
         <ChronaProvider>
-          <StatusBar style="dark" />
-          <RootLayoutNav />
+          <CalendarProvider>
+            <StatusBar style="dark" />
+            <RootLayoutNav />
+          </CalendarProvider>
         </ChronaProvider>
       </GestureHandlerRootView>
     </QueryClientProvider>
