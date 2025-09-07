@@ -9,9 +9,9 @@ export default function Index() {
 
   const checkInitialRoute = async () => {
     try {
-      const hasLaunched = await AsyncStorage.getItem('chrona_has_launched');
+      const hasLaunched = await AsyncStorage.getItem('workflow_has_launched');
       if (hasLaunched) {
-        router.replace('/(tabs)/metrology');
+        router.replace('/(tabs)/tasks');
       } else {
         router.replace('/splash');
       }

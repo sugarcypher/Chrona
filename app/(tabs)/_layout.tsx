@@ -77,14 +77,14 @@ export default function TabLayout() {
       <Tabs.Screen
         name="flow"
         options={{
-          title: "Focus",
+          title: "Team",
           tabBarIcon: ({ color }) => <Activity size={22} color={color} />,
         }}
       />
       <Tabs.Screen
         name="mindset"
         options={{
-          title: "Wellness",
+          title: "Compliance",
           tabBarIcon: ({ color }) => <Brain size={22} color={color} />,
         }}
       />

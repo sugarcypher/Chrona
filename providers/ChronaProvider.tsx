@@ -94,11 +94,11 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
   const saveData = useCallback(async () => {
     try {
       await Promise.all([
-        AsyncStorage.setItem('chrona_tasks', JSON.stringify(tasks)),
-        AsyncStorage.setItem('chrona_blocks', JSON.stringify(timeBlocks)),
-        AsyncStorage.setItem('chrona_entropy', JSON.stringify(entropyBudget)),
-        AsyncStorage.setItem('chrona_nudges', JSON.stringify(nudgeLedger)),
-        AsyncStorage.setItem('chrona_settings', JSON.stringify(settings)),
+        AsyncStorage.setItem('workflow_tasks', JSON.stringify(tasks)),
+        AsyncStorage.setItem('workflow_blocks', JSON.stringify(timeBlocks)),
+        AsyncStorage.setItem('workflow_entropy', JSON.stringify(entropyBudget)),
+        AsyncStorage.setItem('workflow_nudges', JSON.stringify(nudgeLedger)),
+        AsyncStorage.setItem('workflow_settings', JSON.stringify(settings)),
       ]);
     } catch (error) {
       console.error('Error saving data:', error);
@@ -113,11 +113,11 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
   const loadData = async () => {
     try {
       const [tasksData, blocksData, budgetData, nudgesData, settingsData] = await Promise.all([
-        AsyncStorage.getItem('chrona_tasks'),
-        AsyncStorage.getItem('chrona_blocks'),
-        AsyncStorage.getItem('chrona_entropy'),
-        AsyncStorage.getItem('chrona_nudges'),
-        AsyncStorage.getItem('chrona_settings'),
+        AsyncStorage.getItem('workflow_tasks'),
+        AsyncStorage.getItem('workflow_blocks'),
+        AsyncStorage.getItem('workflow_entropy'),
+        AsyncStorage.getItem('workflow_nudges'),
+        AsyncStorage.getItem('workflow_settings'),
       ]);
 
       if (tasksData) setTasks(JSON.parse(tasksData));
@@ -371,11 +371,11 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
     setActiveTask(null);
     
     await AsyncStorage.multiRemove([
-      'chrona_tasks',
-      'chrona_blocks',
-      'chrona_entropy',
-      'chrona_nudges',
-      'chrona_settings',
+      'workflow_tasks',
+      'workflow_blocks',
+      'workflow_entropy',
+      'workflow_nudges',
+      'workflow_settings',
     ]);
   }, []);
 

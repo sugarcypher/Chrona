@@ -293,9 +293,9 @@ export default function TasksScreen() {
 
   const renderCalendarIntegration = () => (
     <View style={styles.calendarSection}>
-      <Text style={styles.sectionTitle}>Calendar Integration</Text>
+      <Text style={styles.sectionTitle}>Enterprise Calendar Integration</Text>
       <Text style={styles.sectionDescription}>
-        Connect your external calendars to sync tasks and schedule blocks
+        Connect enterprise calendars to sync work tasks, meetings, and schedule optimization
       </Text>
       
       <View style={styles.integrationGrid}>
@@ -303,8 +303,8 @@ export default function TasksScreen() {
           style={styles.integrationCard}
           onPress={() => {
             Alert.alert(
-              'Google Calendar Integration',
-              'Connect your Google Calendar to sync tasks and events. This will allow Chrona to:\n\n• Import existing events as time blocks\n• Export tasks to your calendar\n• Detect scheduling conflicts\n• Optimize around existing commitments',
+              'Google Workspace Integration',
+              'Connect your Google Workspace to sync work tasks and meetings. This will allow WorkFlow Manager to:\n\n• Import work meetings as time blocks\n• Export work tasks to team calendars\n• Detect scheduling conflicts\n• Optimize around team commitments',
               [
                 { text: 'Cancel', style: 'cancel' },
                 { text: 'Connect', onPress: () => Alert.alert('Demo', 'Calendar integration would be implemented here') },
@@ -313,7 +313,7 @@ export default function TasksScreen() {
           }}
         >
           <Calendar size={24} color="#3B82F6" />
-          <Text style={styles.integrationTitle}>Google Calendar</Text>
+          <Text style={styles.integrationTitle}>Google Workspace</Text>
           <Text style={styles.integrationStatus}>Not Connected</Text>
           <ExternalLink size={16} color="#6B7280" />
         </TouchableOpacity>
@@ -322,8 +322,8 @@ export default function TasksScreen() {
           style={styles.integrationCard}
           onPress={() => {
             Alert.alert(
-              'Apple Calendar Integration',
-              'Connect your Apple Calendar to sync with Chrona. This integration provides:\n\n• Seamless event import\n• Two-way task synchronization\n• Smart scheduling around meetings\n• Focus time blocking',
+              'Apple Business Integration',
+              'Connect your Apple Business Calendar to sync with WorkFlow Manager. This integration provides:\n\n• Enterprise event import\n• Two-way work task synchronization\n• Smart scheduling around team meetings\n• Focus time blocking for deep work',
               [
                 { text: 'Cancel', style: 'cancel' },
                 { text: 'Connect', onPress: () => Alert.alert('Demo', 'Apple Calendar integration would be implemented here') },
@@ -332,7 +332,7 @@ export default function TasksScreen() {
           }}
         >
           <Calendar size={24} color="#000000" />
-          <Text style={styles.integrationTitle}>Apple Calendar</Text>
+          <Text style={styles.integrationTitle}>Apple Business</Text>
           <Text style={styles.integrationStatus}>Not Connected</Text>
           <ExternalLink size={16} color="#6B7280" />
         </TouchableOpacity>
@@ -341,8 +341,8 @@ export default function TasksScreen() {
           style={styles.integrationCard}
           onPress={() => {
             Alert.alert(
-              'Outlook Integration',
-              'Connect Microsoft Outlook for enterprise productivity:\n\n• Meeting time block creation\n• Task deadline synchronization\n• Team calendar coordination\n• Focus time protection',
+              'Microsoft 365 Integration',
+              'Connect Microsoft 365 for enterprise productivity:\n\n• Teams meeting integration\n• Work task deadline synchronization\n• Enterprise calendar coordination\n• Focus time protection across teams',
               [
                 { text: 'Cancel', style: 'cancel' },
                 { text: 'Connect', onPress: () => Alert.alert('Demo', 'Outlook integration would be implemented here') },
@@ -351,7 +351,7 @@ export default function TasksScreen() {
           }}
         >
           <Calendar size={24} color="#0078D4" />
-          <Text style={styles.integrationTitle}>Outlook</Text>
+          <Text style={styles.integrationTitle}>Microsoft 365</Text>
           <Text style={styles.integrationStatus}>Not Connected</Text>
           <ExternalLink size={16} color="#6B7280" />
         </TouchableOpacity>
@@ -360,8 +360,8 @@ export default function TasksScreen() {
           style={styles.integrationCard}
           onPress={() => {
             Alert.alert(
-              'Import Calendar File',
-              'Import events from any calendar application using .ics files:\n\n• Drag and drop .ics files\n• Bulk import events as time blocks\n• Preserve event metadata\n• Maintain privacy (local processing)',
+              'Import Enterprise Calendar',
+              'Import work events from any enterprise calendar using .ics files:\n\n• Drag and drop enterprise .ics files\n• Bulk import work events as time blocks\n• Preserve meeting metadata\n• Maintain enterprise security standards',
               [
                 { text: 'Cancel', style: 'cancel' },
                 { text: 'Import File', onPress: () => Alert.alert('Demo', 'File import would be implemented here') },
@@ -370,7 +370,7 @@ export default function TasksScreen() {
           }}
         >
           <Import size={24} color="#6B7280" />
-          <Text style={styles.integrationTitle}>Import .ics</Text>
+          <Text style={styles.integrationTitle}>Import Enterprise .ics</Text>
           <Text style={styles.integrationStatus}>Upload File</Text>
           <ExternalLink size={16} color="#6B7280" />
         </TouchableOpacity>
@@ -380,16 +380,16 @@ export default function TasksScreen() {
         style={styles.syncButton}
         onPress={() => {
           Alert.alert(
-            'Sync All Calendars',
-            'This will synchronize all connected calendars with Chrona:\n\n• Import new events as time blocks\n• Export pending tasks to calendars\n• Update existing entries\n• Resolve scheduling conflicts',
+            'Sync All Enterprise Calendars',
+            'This will synchronize all connected enterprise calendars with WorkFlow Manager:\n\n• Import new work events as time blocks\n• Export pending work tasks to team calendars\n• Update existing work entries\n• Resolve team scheduling conflicts',
             [
               { text: 'Cancel', style: 'cancel' },
               { 
                 text: 'Sync Now', 
                 onPress: () => {
-                  Alert.alert('Syncing...', 'Calendar synchronization in progress');
+                  Alert.alert('Syncing...', 'Enterprise calendar synchronization in progress');
                   setTimeout(() => {
-                    Alert.alert('Sync Complete', 'All calendars have been synchronized successfully.');
+                    Alert.alert('Sync Complete', 'All enterprise calendars have been synchronized successfully.');
                   }, 2000);
                 }
               },
@@ -397,7 +397,7 @@ export default function TasksScreen() {
           );
         }}
       >
-        <Text style={styles.syncButtonText}>Sync All Calendars</Text>
+        <Text style={styles.syncButtonText}>Sync Enterprise Calendars</Text>
       </TouchableOpacity>
     </View>
   );
@@ -407,7 +407,7 @@ export default function TasksScreen() {
       {/* Header */}
       <View style={styles.header}>
         <View>
-          <Text style={styles.headerTitle}>Tasks</Text>
+          <Text style={styles.headerTitle}>Work Tasks</Text>
           <Text style={styles.headerSubtitle}>
             {filteredTasks.length} tasks • {tasks.filter(t => !t.completedAt).length} active
           </Text>
@@ -505,11 +505,11 @@ export default function TasksScreen() {
           {filteredTasks.length === 0 ? (
             <View style={styles.emptyState}>
               <Calendar size={48} color="#9CA3AF" />
-              <Text style={styles.emptyTitle}>No tasks found</Text>
+              <Text style={styles.emptyTitle}>No work tasks found</Text>
               <Text style={styles.emptyDescription}>
                 {filter === 'all' 
-                  ? 'Create your first task to get started'
-                  : `No ${filter} tasks at the moment`
+                  ? 'Create your first work task to begin tracking productivity'
+                  : `No ${filter} work tasks at the moment`
                 }
               </Text>
               <View style={styles.emptyActions}>
@@ -518,14 +518,14 @@ export default function TasksScreen() {
                   onPress={() => setShowCreateModal(true)}
                 >
                   <Plus size={16} color="#FFFFFF" />
-                  <Text style={styles.createButtonText}>Create Task</Text>
+                  <Text style={styles.createButtonText}>Create Work Task</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={styles.planButton}
                   onPress={() => router.push('/itinerary-planner')}
                 >
                   <CalendarDays size={16} color="#6366F1" />
-                  <Text style={styles.planButtonText}>Plan Itinerary</Text>
+                  <Text style={styles.planButtonText}>Plan Work Schedule</Text>
                 </TouchableOpacity>
               </View>
               <TouchableOpacity 
@@ -534,20 +534,20 @@ export default function TasksScreen() {
                   const tourSteps = [
                     {
                       id: 'welcome',
-                      title: 'Welcome to Chrona',
-                      description: 'Your enterprise-grade time management companion. Let\'s explore the key features.',
+                      title: 'Welcome to WorkFlow Manager',
+                      description: 'Your enterprise work-from-home management solution. Let\'s explore the key features for distributed teams.',
                       position: { x: 20, y: 100, width: 300, height: 60 }
                     },
                     {
                       id: 'tasks',
-                      title: 'Task Management',
-                      description: 'Create, track, and optimize your tasks with advanced analytics and calendar integration.',
+                      title: 'Enterprise Task Management',
+                      description: 'Create, assign, and track work tasks with team visibility, compliance monitoring, and productivity analytics.',
                       position: { x: 20, y: 200, width: 300, height: 100 }
                     },
                     {
                       id: 'analytics',
-                      title: 'Smart Analytics',
-                      description: 'View real-time insights about your productivity, including calendar conflicts and focus time.',
+                      title: 'Productivity Analytics',
+                      description: 'Monitor team performance, identify bottlenecks, and ensure compliance with company policies and work standards.',
                       position: { x: 20, y: 320, width: 300, height: 80 }
                     }
                   ];
@@ -568,9 +568,9 @@ export default function TasksScreen() {
                   onPress={() => router.push('/itinerary-planner')}
                 >
                   <CalendarDays size={20} color="#6366F1" />
-                  <Text style={styles.quickActionTitle}>Plan Your Day</Text>
+                  <Text style={styles.quickActionTitle}>Plan Work Day</Text>
                   <Text style={styles.quickActionDescription}>
-                    Create an optimized schedule from your tasks
+                    Create an optimized work schedule from your tasks
                   </Text>
                 </TouchableOpacity>
                 
@@ -579,9 +579,9 @@ export default function TasksScreen() {
                   onPress={() => router.push('/calendar-view')}
                 >
                   <Calendar size={20} color="#10B981" />
-                  <Text style={styles.quickActionTitle}>Calendar View</Text>
+                  <Text style={styles.quickActionTitle}>Work Calendar</Text>
                   <Text style={styles.quickActionDescription}>
-                    See your tasks in a calendar layout
+                    View work tasks and meetings in calendar format
                   </Text>
                 </TouchableOpacity>
               </View>
@@ -601,7 +601,7 @@ export default function TasksScreen() {
             <TouchableOpacity onPress={() => setShowCreateModal(false)}>
               <Text style={styles.modalCancel}>Cancel</Text>
             </TouchableOpacity>
-            <Text style={styles.modalTitle}>New Task</Text>
+            <Text style={styles.modalTitle}>New Work Task</Text>
             <TouchableOpacity onPress={handleCreateTask}>
               <Text style={styles.modalSave}>Save</Text>
             </TouchableOpacity>
@@ -609,12 +609,12 @@ export default function TasksScreen() {
           
           <ScrollView style={styles.modalContent}>
             <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Task Title</Text>
+              <Text style={styles.formLabel}>Work Task Title</Text>
               <TextInput
                 style={styles.formInput}
                 value={newTask.title}
                 onChangeText={(text) => setNewTask(prev => ({ ...prev, title: text }))}
-                placeholder="Enter task title..."
+                placeholder="Enter work task title..."
                 placeholderTextColor="#9CA3AF"
               />
             </View>
@@ -672,7 +672,7 @@ export default function TasksScreen() {
             </View>
             
             <View style={styles.formGroup}>
-              <Text style={styles.formLabel}>Success Criteria</Text>
+              <Text style={styles.formLabel}>Completion Criteria</Text>
               {newTask.verificationCriteria.map((criteria, index) => (
                 <TextInput
                   key={index}
@@ -683,7 +683,7 @@ export default function TasksScreen() {
                     updated[index] = text;
                     setNewTask(prev => ({ ...prev, verificationCriteria: updated }));
                   }}
-                  placeholder={`Criteria ${index + 1}...`}
+                  placeholder={`Completion criteria ${index + 1}...`}
                   placeholderTextColor="#9CA3AF"
                 />
               ))}
@@ -695,7 +695,7 @@ export default function TasksScreen() {
                 }))}
               >
                 <Plus size={16} color="#6366F1" />
-                <Text style={styles.addCriteriaText}>Add Criteria</Text>
+                <Text style={styles.addCriteriaText}>Add Completion Criteria</Text>
               </TouchableOpacity>
             </View>
           </ScrollView>

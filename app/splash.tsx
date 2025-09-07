@@ -139,7 +139,7 @@ export default function SplashScreen() {
 
   const checkFirstLaunch = async () => {
     try {
-      const hasLaunched = await AsyncStorage.getItem('chrona_has_launched');
+      const hasLaunched = await AsyncStorage.getItem('workflow_has_launched');
       if (hasLaunched) {
         router.replace('/(tabs)/tasks');
       }
@@ -160,7 +160,7 @@ export default function SplashScreen() {
     if (!canProceed()) return;
     
     try {
-      await AsyncStorage.setItem('chrona_consent', JSON.stringify({
+      await AsyncStorage.setItem('workflow_consent', JSON.stringify({
         ...consent,
         timestamp: Date.now(),
         version: '1.0.0',
@@ -174,9 +174,9 @@ export default function SplashScreen() {
 
   const completeOnboarding = async () => {
     try {
-      await AsyncStorage.setItem('chrona_has_launched', 'true');
-      await AsyncStorage.setItem('chrona_onboarding_completed', 'true');
-      router.replace('/(tabs)/metrology');
+      await AsyncStorage.setItem('workflow_has_launched', 'true');
+      await AsyncStorage.setItem('workflow_onboarding_completed', 'true');
+      router.replace('/(tabs)/tasks');
     } catch (error) {
       console.error('Error completing onboarding:', error);
     }
@@ -185,23 +185,23 @@ export default function SplashScreen() {
   const onboardingSteps = [
     {
       icon: Clock,
-      title: 'Time Metrology',
-      description: 'Measure your temporal patterns with precision. Track resolution, jitter, drift, and latency to understand how you experience time.',
+      title: 'Work Time Tracking',
+      description: 'Monitor work hours, break patterns, and productivity cycles. Ensure compliance with company policies while optimizing personal efficiency.',
     },
     {
       icon: Target,
-      title: 'Flow State Detection',
-      description: 'Automatically detect when you enter flow states. Monitor intensity, duration, and patterns to optimize your peak performance windows.',
+      title: 'Task Management',
+      description: 'Organize and prioritize work tasks with enterprise integration. Track progress, deadlines, and deliverables with team visibility.',
     },
     {
       icon: Zap,
-      title: 'Entropy Budget',
-      description: 'Manage your daily decision-making energy. Track cognitive load and optimize task sequencing for maximum efficiency.',
+      title: 'Productivity Insights',
+      description: 'Analyze work patterns, identify bottlenecks, and optimize workflows. Get actionable insights to improve team performance.',
     },
     {
       icon: BarChart3,
-      title: 'Chrono Fingerprint',
-      description: 'Discover your unique temporal signature. Identify peak focus hours, stability windows, and personalized productivity patterns.',
+      title: 'Team Analytics',
+      description: 'Access comprehensive dashboards showing team productivity, collaboration patterns, and performance metrics for management oversight.',
     },
   ];
 
@@ -212,9 +212,9 @@ export default function SplashScreen() {
     return (
       <View style={styles.onboardingContainer}>
         <View style={styles.onboardingHeader}>
-          <Text style={styles.onboardingTitle}>Welcome to Chrona</Text>
+          <Text style={styles.onboardingTitle}>Welcome to WorkFlow Manager</Text>
           <Text style={styles.onboardingSubtitle}>
-            Let&apos;s explore how Chrona helps you master time
+            Let&apos;s explore how WorkFlow Manager optimizes your work-from-home experience
           </Text>
         </View>
         
@@ -334,8 +334,8 @@ export default function SplashScreen() {
             transform: [{ translateY: slideAnim }],
           }
         ]}>
-          <Text style={styles.logoText}>Chrona</Text>
-          <Text style={styles.tagline}>Time Metrology for Human Flourishing</Text>
+          <Text style={styles.logoText}>WorkFlow Manager</Text>
+          <Text style={styles.tagline}>Enterprise Work-From-Home Management</Text>
         </Animated.View>
       </View>
       
@@ -347,7 +347,7 @@ export default function SplashScreen() {
         }
       ]}>
         <Text style={styles.description}>
-          The first enterprise-grade platform for measuring, understanding, and optimizing your temporal experience with scientific precision.
+          Comprehensive work-from-home management solution for enterprise teams. Monitor productivity, optimize workflows, and ensure compliance across distributed workforces.
         </Text>
         
         <View style={styles.featureGrid}>
@@ -355,32 +355,32 @@ export default function SplashScreen() {
             <View style={styles.featureIconContainer}>
               <Shield size={24} color={Colors.success[500]} strokeWidth={1.5} />
             </View>
-            <Text style={styles.featureTitle}>Enterprise Security</Text>
-            <Text style={styles.featureSubtitle}>Bank-grade encryption</Text>
+            <Text style={styles.featureTitle}>Device Management</Text>
+            <Text style={styles.featureSubtitle}>Secure monitoring</Text>
           </View>
           
           <View style={styles.featureCard}>
             <View style={styles.featureIconContainer}>
               <Brain size={24} color={Colors.info[500]} strokeWidth={1.5} />
             </View>
-            <Text style={styles.featureTitle}>AI-Powered Insights</Text>
-            <Text style={styles.featureSubtitle}>Predictive analytics</Text>
+            <Text style={styles.featureTitle}>Productivity Analytics</Text>
+            <Text style={styles.featureSubtitle}>Real-time insights</Text>
           </View>
           
           <View style={styles.featureCard}>
             <View style={styles.featureIconContainer}>
               <TrendingUp size={24} color={Colors.accent[500]} strokeWidth={1.5} />
             </View>
-            <Text style={styles.featureTitle}>Performance Optimization</Text>
-            <Text style={styles.featureSubtitle}>Measurable results</Text>
+            <Text style={styles.featureTitle}>Team Coordination</Text>
+            <Text style={styles.featureSubtitle}>Seamless collaboration</Text>
           </View>
           
           <View style={styles.featureCard}>
             <View style={styles.featureIconContainer}>
               <Lock size={24} color={Colors.warning[500]} strokeWidth={1.5} />
             </View>
-            <Text style={styles.featureTitle}>Privacy First</Text>
-            <Text style={styles.featureSubtitle}>Local-only processing</Text>
+            <Text style={styles.featureTitle}>Compliance Ready</Text>
+            <Text style={styles.featureSubtitle}>Audit trails</Text>
           </View>
         </View>
       </Animated.View>
@@ -403,21 +403,21 @@ export default function SplashScreen() {
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
           >
-            <Text style={styles.primaryButtonText}>Start Time Mastery</Text>
+            <Text style={styles.primaryButtonText}>Begin Enterprise Setup</Text>
             <ArrowRight size={20} color={Colors.background.primary} strokeWidth={2} />
           </LinearGradient>
         </TouchableOpacity>
         
-        <Text style={styles.versionText}>Version 1.0.0 • Enterprise Edition</Text>
+        <Text style={styles.versionText}>Version 1.0.0 • Enterprise Work-From-Home Manager</Text>
       </Animated.View>
     </View>
   );
 
   const renderConsent = () => (
     <View style={styles.stepContainer}>
-      <Text style={styles.stepTitle}>Informed Consent & Cooperation</Text>
+      <Text style={styles.stepTitle}>Enterprise Policy Agreement</Text>
       <Text style={styles.stepSubtitle}>
-        Chrona operates on principles of transparency, consent, and mutual benefit. Please review and acknowledge:
+        WorkFlow Manager operates under enterprise security and compliance standards. Please review and acknowledge:
       </Text>
       
       <ScrollView style={styles.consentContainer} showsVerticalScrollIndicator={false}>
@@ -430,9 +430,9 @@ export default function SplashScreen() {
               {consent.dataProcessing && <CheckCircle size={16} color="#FFFFFF" />}
             </View>
             <View style={styles.consentContent}>
-              <Text style={styles.consentTitle}>Data Processing Transparency</Text>
+              <Text style={styles.consentTitle}>Work Activity Monitoring</Text>
               <Text style={styles.consentText}>
-                I understand that Chrona processes temporal metrics (timing, patterns, focus states) locally on my device. All processing algorithms are explainable, and I maintain full control over my data.
+                I understand that WorkFlow Manager monitors work activities, productivity metrics, and application usage for enterprise compliance and optimization purposes. Data is processed according to company policy.
               </Text>
             </View>
           </TouchableOpacity>
@@ -447,9 +447,9 @@ export default function SplashScreen() {
               {consent.temporalMetrics && <CheckCircle size={16} color="#FFFFFF" />}
             </View>
             <View style={styles.consentContent}>
-              <Text style={styles.consentTitle}>Temporal Metrics Collection</Text>
+              <Text style={styles.consentTitle}>Productivity Data Collection</Text>
               <Text style={styles.consentText}>
-                I consent to Chrona measuring my time patterns (resolution, jitter, drift, latency) to generate personalized insights. These metrics remain on my device unless I explicitly choose to share anonymized data.
+                I consent to WorkFlow Manager collecting productivity metrics, task completion data, and work patterns to optimize team performance and ensure compliance with company policies.
               </Text>
             </View>
           </TouchableOpacity>
@@ -464,9 +464,9 @@ export default function SplashScreen() {
               {consent.cooperativeResearch && <CheckCircle size={16} color="#FFFFFF" />}
             </View>
             <View style={styles.consentContent}>
-              <Text style={styles.consentTitle}>Cooperative Research Participation</Text>
+              <Text style={styles.consentTitle}>Enterprise Analytics Participation</Text>
               <Text style={styles.consentText}>
-                I agree to participate in advancing time metrology research through optional, anonymized data sharing. I can revoke this consent at any time and retain full ownership of my temporal patterns.
+                I agree to participate in enterprise-wide productivity analytics to improve team efficiency and identify optimization opportunities. Data sharing follows company data governance policies.
               </Text>
             </View>
           </TouchableOpacity>
@@ -481,9 +481,9 @@ export default function SplashScreen() {
               {consent.liabilityAcknowledged && <CheckCircle size={16} color="#FFFFFF" />}
             </View>
             <View style={styles.consentContent}>
-              <Text style={styles.consentTitle}>Liability & Responsibility</Text>
+              <Text style={styles.consentTitle}>Enterprise Compliance & Responsibility</Text>
               <Text style={styles.consentText}>
-                I acknowledge that Chrona is a tool for temporal awareness and optimization. I remain responsible for my time management decisions and understand that the app provides insights, not guarantees. I release Chrona from liability for productivity outcomes.
+                I acknowledge that WorkFlow Manager is an enterprise productivity tool. I agree to use it in accordance with company policies and understand that monitoring data may be used for performance evaluation and compliance purposes.
               </Text>
             </View>
           </TouchableOpacity>
@@ -496,7 +496,7 @@ export default function SplashScreen() {
         disabled={!canProceed()}
       >
         <Text style={[styles.proceedButtonText, !canProceed() && styles.proceedButtonTextDisabled]}>
-          {canProceed() ? 'Enter Chrona' : 'Please acknowledge all items'}
+          {canProceed() ? 'Begin Work Session' : 'Please acknowledge all items'}
         </Text>
         {canProceed() && <ArrowRight size={20} color="#FFFFFF" />}
       </TouchableOpacity>
