@@ -78,7 +78,8 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
   });
   
   // Calendar integration
-  const { events: calendarEvents } = useCalendar();
+  const calendarContext = useCalendar();
+  const calendarEvents = useMemo(() => calendarContext?.events || [], [calendarContext?.events]);
 
   // Load data from AsyncStorage
   useEffect(() => {
@@ -375,7 +376,7 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
 
   const { startTour, startDefaultTour, showTour } = useOnboardingTour();
 
-  return {
+  return useMemo(() => ({
     tasks,
     activeTask,
     timeBlocks,
@@ -411,7 +412,37 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
     startTour,
     startDefaultTour,
     showTour,
-  };
+  }), [
+    tasks,
+    activeTask,
+    timeBlocks,
+    flowState,
+    currentMetrics,
+    chronoFingerprint,
+    entropyBudget,
+    nudgeLedger,
+    nudgeSettings,
+    settings,
+    calendarEvents,
+    getTasksWithCalendarContext,
+    createTaskFromEvent,
+    getAnalyticsWithCalendar,
+    addTask,
+    updateTask,
+    startTask,
+    pauseTask,
+    completeTask,
+    addTimeBlock,
+    updateFlowState,
+    updateEntropyBudget,
+    addNudge,
+    updateNudgeSettings,
+    updateSettings,
+    clearAllData,
+    startTour,
+    startDefaultTour,
+    showTour,
+  ]);
 });
 
 function OnboardingTourWrapper() {
