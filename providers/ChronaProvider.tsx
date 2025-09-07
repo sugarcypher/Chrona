@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useMemo } from 'react';
 import createContextHook from '@nkzw/create-context-hook';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Task, TimeBlock, FlowState, ChronoFingerprint, Nudge, TimeMetrics, CalendarEvent } from '@/types/chrona';
-import { default as OnboardingTourComponent, TourStep } from '@/components/ui/OnboardingTour';
+import { TourStep } from '@/components/ui/OnboardingTour';
 import { useOnboardingTour } from '@/hooks/useOnboardingTour';
 import { useCalendar } from '@/providers/CalendarProvider';
 
@@ -414,18 +414,31 @@ export const [ChronaContextProviderComponent, useChrona] = createContextHook<Chr
   };
 });
 
-export function ChronaProvider({ children }: { children: React.ReactNode }) {
-  const { showTour, tourSteps, completeTour, skipTour } = useOnboardingTour();
+function OnboardingTourWrapper() {
+  const { showTour } = useChrona();
+  const { tourSteps, completeTour, skipTour } = useOnboardingTour();
+  
+  if (!showTour) return null;
+  
+  const OnboardingTourComponent = React.lazy(() => import('@/components/ui/OnboardingTour').then(module => ({ default: module.default })));
   
   return (
-    <ChronaContextProviderComponent>
-      {children}
+    <React.Suspense fallback={null}>
       <OnboardingTourComponent
         visible={showTour}
         steps={tourSteps}
         onComplete={completeTour}
         onSkip={skipTour}
       />
+    </React.Suspense>
+  );
+}
+
+export function ChronaProvider({ children }: { children: React.ReactNode }) {
+  return (
+    <ChronaContextProviderComponent>
+      {children}
+      <OnboardingTourWrapper />
     </ChronaContextProviderComponent>
   );
 }
