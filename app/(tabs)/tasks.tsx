@@ -56,7 +56,8 @@ export default function TasksScreen() {
     getAnalyticsWithCalendar,
     createTaskFromEvent,
     calendarEvents,
-    startTour
+    startTour,
+    startDefaultTour
   } = useChrona();
   const [showCreateModal, setShowCreateModal] = useState(false);
   const [showCalendarModal, setShowCalendarModal] = useState(false);
@@ -500,6 +501,28 @@ export default function TasksScreen() {
           </View>
         </View>
 
+        {/* Calendar Integration CTA */}
+        {filteredTasks.length > 0 && (
+          <View style={styles.calendarCTA}>
+            <View style={styles.calendarCTAContent}>
+              <Calendar size={24} color="#6366F1" />
+              <View style={styles.calendarCTAText}>
+                <Text style={styles.calendarCTATitle}>Connect Enterprise Calendars</Text>
+                <Text style={styles.calendarCTADescription}>
+                  Sync work meetings and optimize your schedule
+                </Text>
+              </View>
+            </View>
+            <TouchableOpacity 
+              style={styles.calendarCTAButton}
+              onPress={() => router.push('/calendar-integrations')}
+            >
+              <Text style={styles.calendarCTAButtonText}>Integrate</Text>
+              <ExternalLink size={14} color="#FFFFFF" />
+            </TouchableOpacity>
+          </View>
+        )}
+
         {/* Tasks */}
         <View style={styles.tasksContainer}>
           {filteredTasks.length === 0 ? (
@@ -521,38 +544,16 @@ export default function TasksScreen() {
                   <Text style={styles.createButtonText}>Create Work Task</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
-                  style={styles.planButton}
-                  onPress={() => router.push('/itinerary-planner')}
+                  style={styles.calendarIntegrateButton}
+                  onPress={() => router.push('/calendar-integrations')}
                 >
-                  <CalendarDays size={16} color="#6366F1" />
-                  <Text style={styles.planButtonText}>Plan Work Schedule</Text>
+                  <Calendar size={16} color="#FFFFFF" />
+                  <Text style={styles.calendarIntegrateButtonText}>Integrate Calendars</Text>
                 </TouchableOpacity>
               </View>
               <TouchableOpacity 
                 style={styles.tourButton}
-                onPress={() => {
-                  const tourSteps = [
-                    {
-                      id: 'welcome',
-                      title: 'Welcome to WorkFlow Manager',
-                      description: 'Your enterprise work-from-home management solution. Let\'s explore the key features for distributed teams.',
-                      position: { x: 20, y: 100, width: 300, height: 60 }
-                    },
-                    {
-                      id: 'tasks',
-                      title: 'Enterprise Task Management',
-                      description: 'Create, assign, and track work tasks with team visibility, compliance monitoring, and productivity analytics.',
-                      position: { x: 20, y: 200, width: 300, height: 100 }
-                    },
-                    {
-                      id: 'analytics',
-                      title: 'Productivity Analytics',
-                      description: 'Monitor team performance, identify bottlenecks, and ensure compliance with company policies and work standards.',
-                      position: { x: 20, y: 320, width: 300, height: 80 }
-                    }
-                  ];
-                  startTour(tourSteps);
-                }}
+                onPress={startDefaultTour}
               >
                 <Text style={styles.tourButtonText}>Take Tour</Text>
               </TouchableOpacity>
@@ -1080,6 +1081,69 @@ const styles = StyleSheet.create({
   planButtonText: {
     color: Colors.accent[600],
     fontSize: Typography.fontSize.base,
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  calendarIntegrateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.success[600],
+    paddingHorizontal: Spacing.xl,
+    paddingVertical: Spacing.md,
+    borderRadius: BorderRadius.lg,
+    gap: Spacing.sm,
+    ...Shadows.sm,
+  },
+  calendarIntegrateButtonText: {
+    color: Colors.text.inverse,
+    fontSize: Typography.fontSize.base,
+    fontWeight: Typography.fontWeight.semibold,
+  },
+  calendarCTA: {
+    backgroundColor: Colors.background.primary,
+    marginHorizontal: 20,
+    marginBottom: 20,
+    padding: Spacing.xl,
+    borderRadius: BorderRadius['2xl'],
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    borderWidth: 2,
+    borderColor: Colors.accent[200],
+    ...Shadows.md,
+  },
+  calendarCTAContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1,
+    gap: Spacing.md,
+  },
+  calendarCTAText: {
+    flex: 1,
+  },
+  calendarCTATitle: {
+    fontSize: Typography.fontSize.lg,
+    fontWeight: Typography.fontWeight.semibold,
+    color: Colors.text.primary,
+    marginBottom: Spacing.xs,
+  },
+  calendarCTADescription: {
+    fontSize: Typography.fontSize.sm,
+    color: Colors.text.tertiary,
+    lineHeight: Typography.lineHeight.normal * Typography.fontSize.sm,
+  },
+  calendarCTAButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: Colors.accent[600],
+    paddingHorizontal: Spacing.lg,
+    paddingVertical: Spacing.sm,
+    borderRadius: BorderRadius.lg,
+    gap: Spacing.xs,
+    ...Shadows.sm,
+  },
+  calendarCTAButtonText: {
+    color: Colors.text.inverse,
+    fontSize: Typography.fontSize.sm,
     fontWeight: Typography.fontWeight.semibold,
   },
   quickActions: {
