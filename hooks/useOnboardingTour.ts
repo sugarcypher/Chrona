@@ -1,9 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { TourStep } from '@/components/ui/OnboardingTour';
-import { Dimensions } from 'react-native';
-
-const { width, height } = Dimensions.get('window');
 
 export function useOnboardingTour() {
   const [showTour, setShowTour] = useState(false);
@@ -14,38 +11,73 @@ export function useOnboardingTour() {
       {
         id: 'welcome',
         title: 'Welcome to Chrona',
-        description: 'Your enterprise-grade time management companion. Chrona uses advanced analytics and calendar integration to optimize your productivity.',
-        position: { x: 20, y: 120, width: width - 40, height: 80 }
-      },
-      {
-        id: 'tasks',
-        title: 'Smart Task Management',
-        description: 'Create, track, and optimize your tasks with power-law estimation, context switching costs, and satisficing thresholds for maximum efficiency.',
-        position: { x: 20, y: 200, width: width - 40, height: 100 }
+        description: 'Your enterprise work-from-home management solution. Gain insights into remote team productivity and optimize distributed work patterns.',
+        icon: 'users',
+        features: [
+          'Monitor remote team productivity patterns',
+          'Track work-from-home efficiency metrics',
+          'Optimize distributed team collaboration'
+        ]
       },
       {
         id: 'calendar',
         title: 'Calendar Integration',
-        description: 'Connect Google Calendar, Outlook, or Apple Calendar to sync events, detect conflicts, and optimize your schedule around existing commitments.',
-        position: { x: 20, y: 320, width: width - 40, height: 100 }
+        description: 'Connect employee calendars to understand meeting patterns, availability, and work-life balance in remote settings.',
+        icon: 'calendar',
+        features: [
+          'Sync Google Calendar, Outlook, and Apple Calendar',
+          'Detect meeting fatigue and overload',
+          'Analyze focus time vs. collaboration time',
+          'Track cross-timezone coordination efficiency'
+        ]
+      },
+      {
+        id: 'tasks',
+        title: 'Task & Project Tracking',
+        description: 'Monitor task completion rates, project velocity, and identify bottlenecks in remote work environments.',
+        icon: 'target',
+        features: [
+          'Track individual and team task completion',
+          'Measure project delivery timelines',
+          'Identify productivity blockers',
+          'Optimize task allocation across time zones'
+        ]
       },
       {
         id: 'analytics',
-        title: 'Advanced Analytics',
-        description: 'View real-time insights about your productivity patterns, including meeting overhead, focus time blocks, and interruption rates.',
-        position: { x: 20, y: 440, width: width - 40, height: 100 }
+        title: 'Productivity Analytics',
+        description: 'Get comprehensive insights into remote work patterns, team performance, and areas for improvement.',
+        icon: 'bar-chart',
+        features: [
+          'Real-time productivity dashboards',
+          'Team performance comparisons',
+          'Work pattern analysis and trends',
+          'Custom reporting for management'
+        ]
       },
       {
         id: 'focus',
-        title: 'Flow State Tracking',
-        description: 'Monitor your focus intensity, track flow triggers, and optimize your work environment for sustained deep work sessions.',
-        position: { x: 20, y: 560, width: width - 40, height: 100 }
+        title: 'Focus & Well-being',
+        description: 'Monitor deep work sessions, break patterns, and ensure healthy work-life balance for remote employees.',
+        icon: 'brain',
+        features: [
+          'Track focus time and interruption patterns',
+          'Monitor work-life balance indicators',
+          'Identify burnout risk factors',
+          'Promote healthy remote work habits'
+        ]
       },
       {
         id: 'privacy',
-        title: 'Privacy-First Design',
-        description: 'All your data stays on your device. Micro-pattern detection and analytics work locally without compromising your privacy.',
-        position: { x: 20, y: height - 200, width: width - 40, height: 80 }
+        title: 'Enterprise Security',
+        description: 'All employee data is processed securely with enterprise-grade privacy controls and compliance standards.',
+        icon: 'shield',
+        features: [
+          'GDPR and SOC 2 compliant data handling',
+          'Local data processing where possible',
+          'Anonymized team insights',
+          'Configurable privacy settings'
+        ]
       }
     ];
     
@@ -61,11 +93,10 @@ export function useOnboardingTour() {
       ]);
 
       if (!hasLaunched || !tourCompleted) {
-        // Mark as launched and show tour after a brief delay
         await AsyncStorage.setItem('chrona_has_launched', 'true');
         setTimeout(() => {
           startDefaultTour();
-        }, 2000);
+        }, 1500);
       }
     } catch (error) {
       console.error('Error checking tour status:', error);
@@ -88,6 +119,8 @@ export function useOnboardingTour() {
       setTourSteps([]);
     } catch (error) {
       console.error('Error completing tour:', error);
+      setShowTour(false);
+      setTourSteps([]);
     }
   };
 
@@ -98,6 +131,17 @@ export function useOnboardingTour() {
       setTourSteps([]);
     } catch (error) {
       console.error('Error skipping tour:', error);
+      setShowTour(false);
+      setTourSteps([]);
+    }
+  };
+
+  const resetTour = async () => {
+    try {
+      await AsyncStorage.removeItem('chrona_tour_completed');
+      startDefaultTour();
+    } catch (error) {
+      console.error('Error resetting tour:', error);
     }
   };
 
@@ -108,5 +152,6 @@ export function useOnboardingTour() {
     startDefaultTour,
     completeTour,
     skipTour,
+    resetTour,
   };
 }
